@@ -1,13 +1,16 @@
 import openai
 
-def initialize_openai():
-    API_KEY = input("API KEY: ")
-    openai.api_key = API_KEY
-    model_id = 'gpt-3.5-turbo'
-    TEMPERATURE = 0.2
-    return model_id, TEMPERATURE
+def initialize_gpt(api_key):
+    openai.api_key = api_key
 
-def initialize_conversations():
+def initialize_system_prompt():
+    """
+    Initializes the conversations list with system instructions and test script content.
+
+    Returns:
+    - conversations (list): A list of conversation objects.
+    Each object represents a role and content in the conversation.
+    """
     conversations = []
     conversations.append({'role': 'system', 'content': 
     """You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form queries.
@@ -23,7 +26,19 @@ def initialize_conversations():
     conversations.append({'role': 'system', 'content': testscript})
     return conversations
 
-def chatgpt_conversation(model_id, temperature, conversation_log):
+def new_conversation(model_id, temperature, conversation_log):
+    """
+    Performs conversation completion using OpenAI's Chat API.
+
+    Args:
+    - model_id (str): The ID of the GPT model to be used.
+    - temperature (float): The temperature value for generating responses.
+    - conversation_log (list): A list of conversation objects representing the conversation history.
+
+    Returns:
+    - tokens (int): The total number of tokens used in the API response.
+    - conversation_log (list): The updated conversation log with the new response appended.
+    """
     response = openai.ChatCompletion.create(
         model=model_id,
         messages=conversation_log,
@@ -37,4 +52,3 @@ def chatgpt_conversation(model_id, temperature, conversation_log):
     
     tokens = response.usage['total_tokens']
     return tokens, conversation_log
-

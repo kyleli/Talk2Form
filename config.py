@@ -1,0 +1,3 @@
+MODEL_ID = 'gpt-3.5-turbo'
+TEMPERATURE = 0.2
+MAX_TOKENS = 4096
