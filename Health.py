@@ -35,10 +35,9 @@ conversations.append({'role': 'system', 'content':
 - You will only answer the question and not write anything else. If you need more information, write "N/A"."""
 })
 
-# Inital system prompt (change later)
+# Conversation script prompt loaded from file
 with open('testscript.txt', 'r') as file:
     testscript = file.read()
-
 conversations.append({'role': 'system', 'content': testscript})
 
 # Main input loop
