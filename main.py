@@ -1,9 +1,8 @@
 import gpt
 import whisper
-from config import MODEL_ID, TEMPERATURE, MAX_TOKENS
+from config import MODEL_ID, TEMPERATURE, MAX_TOKENS, api_key
 
 def main():
-    api_key = input("API KEY: ")
     gpt.initialize_gpt(api_key)
     conversations = gpt.initialize_system_prompt()
 
