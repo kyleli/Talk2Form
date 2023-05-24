@@ -50,7 +50,7 @@ def record_audio(filename, chunk=1024, channels=1, rate=44100, format=pyaudio.pa
     )
 
     # Export audio segment as MP3 file
-    audio_segment.export(filename, format="mp3")
+    audio_segment.export(filename, format="mp3", bitrate="64k")
 
     print(f"File saved as {filename}")
 

@@ -17,7 +17,7 @@ SYSTEM_PROMPT = """
 CONVERSATION_TYPE = "A Hospital Visit"
 LANGUAGE = "English"
 WHISPER_MODEL_ID = 'whisper-1'
-AUDIO_PATH = 'output.wav'
+AUDIO_PATH = 'output.mp3'
 
 # API Key
 API_KEY = os.environ.get('OPENAI_API_KEY') # Change me to your OpenAI API key
@@ -26,6 +26,7 @@ API_KEY = os.environ.get('OPENAI_API_KEY') # Change me to your OpenAI API key
 ENABLE_AUDIO_RECORDING = True
 ENABLE_WHISPER = True
 ENABLE_GPT = True
+CUSTOM_QUERIES = True
 
 # DEBUGGING EXAMPLE FILES
 ENABLE_DEBUG_TRANSCRIPT = False

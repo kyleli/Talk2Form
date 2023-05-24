@@ -20,7 +20,7 @@ def initialize_system_prompt(SYSTEM_PROMPT, TRANSCRIPT_PATH):
     conversations.append({'role': 'system', 'content': transcript})
     return conversations
 
-def new_conversation(model_id, temperature, conversation_log):
+def new_entry(model_id, temperature, conversation_log):
     """
     Performs conversation completion using OpenAI's Chat API.
 
@@ -46,3 +46,37 @@ def new_conversation(model_id, temperature, conversation_log):
     
     tokens = response.usage['total_tokens']
     return tokens, conversation_log
+
+def process_user_input(conversations, MAX_TOKENS, MODEL_ID, TEMPERATURE):
+    total_tokens = 0
+
+    while total_tokens <= MAX_TOKENS:
+        try:
+            prompt = input('Query: ')
+        except KeyboardInterrupt:
+            print("\nSYSTEM: You have force ended the conversation.")
+            break
+
+        conversations.append({'role': 'user', 'content': prompt})
+        tokens, conversations = new_entry(MODEL_ID, TEMPERATURE, conversations)
+        total_tokens += tokens
+        print()
+
+        if total_tokens <= MAX_TOKENS:
+            if prompt.strip().endswith(":"):
+                print(f"{prompt} {conversations[-1]['content'].strip()}\n")
+            else:
+                print(f"{prompt}: {conversations[-1]['content'].strip()}\n")
+        else:
+            print("You have processed the maximum number of tokens.")
+
+if __name__ == '__main__':
+    conversations = []
+    api_key = input("API KEY: ")
+    initialize_gpt(api_key)
+    initialize_system_prompt("""You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form queries.
+    - The dialogue you are provided will consist of a conversation between a doctor and a patient. 
+    - You will take this information provided and fill out the following form and write "N/A" if you do not have information to factually fill out any information.
+    - The questions will be provided individually and you will answer one at a time.
+    - You will only answer the question and not write anything else. If you need more information or can not give a factual answer, write "N/A".""", 'debug_examples/sample_transcript_2')
+    process_user_input(conversations, 4096, "gpt-3.5-turbo", 0.2)
