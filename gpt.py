@@ -1,10 +1,9 @@
 import openai
-from config import TRANSCRIPT_PATH
 
 def initialize_gpt(API_KEY):
     openai.api_key = API_KEY
 
-def initialize_system_prompt():
+def initialize_system_prompt(SYSTEM_PROMPT, TRANSCRIPT_PATH):
     """
     Initializes the conversations list with system instructions and transcript content.
 
@@ -13,13 +12,7 @@ def initialize_system_prompt():
     Each object represents a role and content in the conversation.
     """
     conversations = []
-    conversations.append({'role': 'system', 'content': 
-    """You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form queries.
-    - The dialogue you are provided will consist of a conversation between a doctor and a patient. 
-    - You will take this information provided and fill out the following form and write "N/A" if you do not have information to factually fill out any information.
-    - The questions will be provided individually and you will answer one at a time.
-    - You will only answer the question and not write anything else. If you need more information, write "N/A"."""
-    })
+    conversations.append({'role': 'system', 'content': SYSTEM_PROMPT})
     
     with open(TRANSCRIPT_PATH, 'r') as file:
         transcript = file.read()

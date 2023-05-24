@@ -2,6 +2,7 @@ import pyaudio
 import wave
 import keyboard
 import time
+from pydub import AudioSegment
 
 def record_audio(filename, chunk=1024, channels=1, rate=44100, format=pyaudio.paInt16):
     p = pyaudio.PyAudio()
@@ -40,13 +41,18 @@ def record_audio(filename, chunk=1024, channels=1, rate=44100, format=pyaudio.pa
     stream.close()
     p.terminate()
 
-    with wave.open(filename, 'wb') as wf:
-        wf.setnchannels(channels)
-        wf.setsampwidth(p.get_sample_size(format))
-        wf.setframerate(rate)
-        wf.writeframes(b''.join(frames))
+    # Convert frames to AudioSegment
+    audio_segment = AudioSegment(
+        b''.join(frames),
+        frame_rate=rate,
+        sample_width=p.get_sample_size(format),
+        channels=channels
+    )
+
+    # Export audio segment as MP3 file
+    audio_segment.export(filename, format="mp3")
 
     print(f"File saved as {filename}")
 
 if __name__ == '__main__':
-    record_audio('output.wav')
+    record_audio('output.mp3')

@@ -1,16 +1,22 @@
 import record
 import whisper
 import gpt
-from config import MODEL_ID, TEMPERATURE, MAX_TOKENS, API_KEY, AUDIO_PATH, enable_audio_recording, enable_gpt, enable_whisper
+from config import MODEL_ID, TEMPERATURE, MAX_TOKENS, API_KEY, AUDIO_PATH, ENABLE_AUDIO_RECORDING, ENABLE_GPT, ENABLE_WHISPER, ENABLE_DEBUG_AUDIO, DEBUG_AUDIO_PATH, ENABLE_DEBUG_TRANSCRIPT, DEBUG_TRANSCRIPT_PATH, TRANSCRIPT_PATH, SYSTEM_PROMPT
 
 def main():
-    if enable_audio_recording:
+    if ENABLE_AUDIO_RECORDING:
         record.record_audio(AUDIO_PATH)
-    if enable_whisper:
-        whisper.convert_audio(API_KEY, AUDIO_PATH)
-    if enable_gpt:
+    if ENABLE_WHISPER:
+        if ENABLE_DEBUG_AUDIO:
+            whisper.convert_audio(API_KEY, DEBUG_AUDIO_PATH)
+        else:
+            whisper.convert_audio(API_KEY, AUDIO_PATH)
+    if ENABLE_GPT:
         gpt.initialize_gpt(API_KEY)
-        conversations = gpt.initialize_system_prompt()
+        if ENABLE_DEBUG_TRANSCRIPT:
+            conversations = gpt.initialize_system_prompt(SYSTEM_PROMPT, DEBUG_TRANSCRIPT_PATH)
+        else:
+            conversations = gpt.initialize_system_prompt(SYSTEM_PROMPT, TRANSCRIPT_PATH)
 
     total_tokens = 0
 
