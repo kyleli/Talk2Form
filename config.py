@@ -16,6 +16,6 @@ AUDIO_PATH = 'output.wav'
 API_KEY = os.environ.get('OPENAI_API_KEY') # Change me to your OpenAI API key
 
 # DEBUGGING
-enable_audio_recording = False
+enable_audio_recording = True
 enable_whisper = True
 enable_gpt = True
