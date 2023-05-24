@@ -1,11 +1,12 @@
 import openai
+from config import TRANSCRIPT_PATH
 
-def initialize_gpt(api_key):
-    openai.api_key = api_key
+def initialize_gpt(API_KEY):
+    openai.api_key = API_KEY
 
 def initialize_system_prompt():
     """
-    Initializes the conversations list with system instructions and test script content.
+    Initializes the conversations list with system instructions and transcript content.
 
     Returns:
     - conversations (list): A list of conversation objects.
@@ -20,10 +21,10 @@ def initialize_system_prompt():
     - You will only answer the question and not write anything else. If you need more information, write "N/A"."""
     })
     
-    with open('testscript.txt', 'r') as file:
-        testscript = file.read()
+    with open(TRANSCRIPT_PATH, 'r') as file:
+        transcript = file.read()
     
-    conversations.append({'role': 'system', 'content': testscript})
+    conversations.append({'role': 'system', 'content': transcript})
     return conversations
 
 def new_conversation(model_id, temperature, conversation_log):

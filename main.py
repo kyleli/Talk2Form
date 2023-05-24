@@ -1,10 +1,16 @@
-import gpt
+import record
 import whisper
-from config import MODEL_ID, TEMPERATURE, MAX_TOKENS, api_key
+import gpt
+from config import MODEL_ID, TEMPERATURE, MAX_TOKENS, API_KEY, AUDIO_PATH, enable_audio_recording, enable_gpt, enable_whisper
 
 def main():
-    gpt.initialize_gpt(api_key)
-    conversations = gpt.initialize_system_prompt()
+    if enable_audio_recording:
+        record.record_audio(AUDIO_PATH)
+    if enable_whisper:
+        whisper.convert_audio(API_KEY, AUDIO_PATH)
+    if enable_gpt:
+        gpt.initialize_gpt(API_KEY)
+        conversations = gpt.initialize_system_prompt()
 
     total_tokens = 0
 
