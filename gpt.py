@@ -20,7 +20,7 @@ def initialize_system_prompt(SYSTEM_PROMPT, TRANSCRIPT_PATH):
     conversations.append({'role': 'system', 'content': transcript})
     return conversations
 
-def new_entry(model_id, temperature, conversation_log):
+def new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversation_log):
     """
     Performs conversation completion using OpenAI's Chat API.
 
@@ -34,9 +34,10 @@ def new_entry(model_id, temperature, conversation_log):
     - conversation_log (list): The updated conversation log with the new response appended.
     """
     response = openai.ChatCompletion.create(
-        model=model_id,
-        messages=conversation_log,
-        temperature=temperature
+        model=MODEL_ID,
+        temperature=TEMPERATURE,
+        presence_penalty=PRESENCE_PENALTY,
+        messages=conversation_log
     )
     
     conversation_log.append({
@@ -47,7 +48,7 @@ def new_entry(model_id, temperature, conversation_log):
     tokens = response.usage['total_tokens']
     return tokens, conversation_log
 
-def process_user_input(conversations, MAX_TOKENS, MODEL_ID, TEMPERATURE):
+def process_user_input(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversations, MAX_TOKENS):
     total_tokens = 0
 
     while total_tokens <= MAX_TOKENS:
@@ -58,7 +59,7 @@ def process_user_input(conversations, MAX_TOKENS, MODEL_ID, TEMPERATURE):
             break
 
         conversations.append({'role': 'user', 'content': prompt})
-        tokens, conversations = new_entry(MODEL_ID, TEMPERATURE, conversations)
+        tokens, conversations = new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversations)
         total_tokens += tokens
         print()
 

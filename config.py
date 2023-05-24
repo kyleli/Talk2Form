@@ -3,6 +3,7 @@ import os
 # GPT Config
 MODEL_ID = 'gpt-3.5-turbo'
 TEMPERATURE = 0.2
+PRESENCE_PENALTY = -0.2
 MAX_TOKENS = 4096
 TRANSCRIPT_PATH = 'transcript.txt'
 SYSTEM_PROMPT = """

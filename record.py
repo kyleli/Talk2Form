@@ -27,7 +27,7 @@ def record_audio(filename, chunk=1024, channels=1, rate=44100, format=pyaudio.pa
             recording = not recording
             key_pressed = True
             print("Recording..." if recording else "Recording paused.")
-            time.sleep(0.5)
+            time.sleep(0.25)
         elif not keyboard.is_pressed('r'):
             key_pressed = False
 

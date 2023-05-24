@@ -21,7 +21,7 @@ def main():
         else:
             conversations = gpt.initialize_system_prompt(SYSTEM_PROMPT, TRANSCRIPT_PATH)
     if CUSTOM_QUERIES:
-        gpt.process_user_input(conversations, MAX_TOKENS, MODEL_ID, TEMPERATURE)
+        gpt.process_user_input(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversations, MAX_TOKENS)
 
 if __name__ == '__main__':
     main()
