@@ -1,15 +1,25 @@
 import openai
 
 def initialize_gpt(API_KEY):
+    """
+    Initializes the OpenAI API key for accessing the Chat API.
+
+    Args:
+    - API_KEY (str): The API key for accessing the OpenAI API.
+    """
     openai.api_key = API_KEY
 
 def initialize_system_prompt(SYSTEM_PROMPT, TRANSCRIPT_PATH):
     """
     Initializes the conversations list with system instructions and transcript content.
 
+    Args:
+    - SYSTEM_PROMPT (str): The system prompt or instructions for the conversation.
+    - TRANSCRIPT_PATH (str): The path to the transcript file containing conversation content.
+
     Returns:
     - conversations (list): A list of conversation objects.
-    Each object represents a role and content in the conversation.
+      Each object represents a role and content in the conversation.
     """
     conversations = []
     conversations.append({'role': 'system', 'content': SYSTEM_PROMPT})
@@ -25,8 +35,9 @@ def new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversation_log):
     Performs conversation completion using OpenAI's Chat API.
 
     Args:
-    - model_id (str): The ID of the GPT model to be used.
-    - temperature (float): The temperature value for generating responses.
+    - MODEL_ID (str): The ID of the GPT model to be used.
+    - TEMPERATURE (float): The temperature value for generating responses.
+    - PRESENCE_PENALTY (float): The presence penalty value for generating responses.
     - conversation_log (list): A list of conversation objects representing the conversation history.
 
     Returns:
@@ -49,6 +60,19 @@ def new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversation_log):
     return tokens, conversation_log
 
 def process_user_input(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversations, MAX_TOKENS):
+    """
+    Processes user input and generates responses using the Chat API.
+
+    Args:
+    - MODEL_ID (str): The ID of the GPT model to be used.
+    - TEMPERATURE (float): The temperature value for generating responses.
+    - PRESENCE_PENALTY (float): The presence penalty value for generating responses.
+    - conversations (list): A list of conversation objects representing the conversation history.
+    - MAX_TOKENS (int): The maximum number of tokens allowed for the conversation.
+
+    Returns:
+    - None
+    """
     total_tokens = 0
 
     while total_tokens <= MAX_TOKENS:

@@ -5,6 +5,19 @@ import time
 from pydub import AudioSegment
 
 def record_audio(filename, chunk=1024, channels=1, rate=44100, format=pyaudio.paInt16):
+    """
+    Records audio from the default microphone and saves it as an MP3 file.
+
+    Args:
+    - filename (str): The name of the output file.
+    - chunk (int): The number of audio frames per buffer.
+    - channels (int): The number of audio channels (1 for mono, 2 for stereo).
+    - rate (int): The sampling rate of the audio.
+    - format (int): The format of the audio data.
+
+    Returns:
+    - None
+    """
     p = pyaudio.PyAudio()
 
     stream = p.open(format=format,
