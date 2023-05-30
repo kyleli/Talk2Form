@@ -1,5 +1,11 @@
 import os
 
+# Whisper Config
+CONVERSATION_TYPE = "A Hospital Visit"
+LANGUAGE = "English"
+WHISPER_MODEL_ID = 'whisper-1'
+AUDIO_PATH = 'output.mp3'
+
 # GPT Config
 MODEL_ID = 'gpt-3.5-turbo'
 TEMPERATURE = 0.2
@@ -14,11 +20,8 @@ SYSTEM_PROMPT = """
     - You will only answer the question and not write anything else. If you need more information or can not give a factual answer, write "N/A".
     """
 
-# Whisper Config
-CONVERSATION_TYPE = "A Hospital Visit"
-LANGUAGE = "English"
-WHISPER_MODEL_ID = 'whisper-1'
-AUDIO_PATH = 'output.mp3'
+# Form Config
+FORM_PATH = 'debug_examples/full_form_single_line.txt'
 
 # API Key
 API_KEY = os.environ.get('OPENAI_API_KEY') # Change me to your OpenAI API key

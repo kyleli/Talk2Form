@@ -95,6 +95,11 @@ def process_user_input(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversations, M
         else:
             print("You have processed the maximum number of tokens.")
 
+def process_form_query(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversations, question):
+    conversations.append({'role': 'user', 'content': question})
+    tokens, conversations = new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversations)
+    return f"{question} {conversations[-1]['content'].strip()}\n"
+
 if __name__ == '__main__':
     conversations = []
     api_key = input("API KEY: ")
