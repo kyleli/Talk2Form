@@ -25,6 +25,12 @@ h2 {
   font-size: 24px;
 }
 
+.error-message {
+  color:red;
+  max-width: 300px;
+  text-align: center;
+}
+
 .header {
   text-align: center;
   background-color: #3B4FB6;

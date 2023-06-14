@@ -11,17 +11,21 @@
     <div class="header">
         <h1>Request Access</h1>
     </div>
-    <div class="form-container">
+    {% for message in messages %}
+    <p class="error-message">{{message}}</p>
+    {% endfor %}
+    <form method="POST" action="{% url 'signup' %}" class="form-container">
+        {% csrf_token %}
         <div class="form-field">
-            <input type="email" placeholder="Email">
+            <input type="email" placeholder="Email" name="email"/>
         </div>
         <div class="form-field">
-            <input type="password" placeholder="Password">
+            <input type="password" placeholder="Password" name="password"/>
         </div>
         <div class="form-field">
-            <input type="password" placeholder="Confirm Password">
+            <input type="password" placeholder="Confirm Password" name="confirmpassword"/>
         </div>
-        <a class="login-button" href="#">Submit</a>
-    </div>
+        <input type="submit" class="login-button" value="Submit">
+    </form>
 </body>
 </html>
