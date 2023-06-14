@@ -13,16 +13,19 @@
         <h1>Dashboard</h1>
     </div>
     <div class="dashboard-container">
-        <a class="form-link" href="#"><span>Form 1</span><i class="ph ph-sign-out"></i></a>
-        <a class="form-link" href="#"><span>Form 2</span><i class="ph ph-sign-out"></i></a>
-        <a class="form-link" href="#"><span>Form 3</span><i class="ph ph-sign-out"></i></a>
+        {% for form_template in form_templates %}
+        <a class="form-link" href="#"><span>{{ form_template.title }}</span><i class="ph ph-sign-in"></i></a>
+        {% endfor %}
     </div>
+    <footer>
+        <div class="bottom-icons">
+            <a class="icon" href="logout"><i class="ph ph-sign-out"></i></a>
+            <form method="POST" class="center-button-form" action="{% url 'create_default_form_template' %}">
+                {% csrf_token %}
+                <a href="dashboard" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph ph-plus"></i></a>
+            </form>
+            <a class="icon" href="usersettings"><i class="ph ph-user-circle"></i></a>
+        </div>
+    </footer>
 </body>
-<footer>
-    <div class="bottom-icons">
-        <a class="icon" href="logout"><i class="ph ph-sign-out"></i></a>
-        <a class="icon center-icon" href="#"><i class="ph ph-plus"></i></a>
-        <a class="icon" href="usersettings"><i class="ph ph-user-circle"></i></a>
-    </div>
-</footer>
 </html>

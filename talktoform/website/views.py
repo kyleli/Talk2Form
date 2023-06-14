@@ -4,8 +4,9 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-
+from .models import FormTemplate
 
 # Create your views here.
 def index(request):
@@ -60,11 +61,26 @@ def signup(request):
     else:
         return render(request, 'signup.html')
 
+@login_required
 def usersettings(request):
     return render(request, 'usersettings.html')
 
+@login_required
 def form(request):
     return render(request, 'form.html')
 
+@login_required
 def dashboard(request):
+    user = request.user
+    form_templates = FormTemplate.objects.filter(user=user)
+    return render(request, 'dashboard.html', {'form_templates': form_templates})
+
+@login_required
+def create_default_form_template(request):
+    if request.method == 'POST':
+        title = 'New Form'
+        body = 'Form description'
+        user = request.user
+        FormTemplate.objects.create(title=title, body=body, user=user)
+        return redirect('dashboard')
     return render(request, 'dashboard.html')

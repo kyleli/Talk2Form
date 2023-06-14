@@ -7,5 +7,6 @@ urlpatterns = [
     path('usersettings', views.usersettings, name='usersettings'),
     path('form', views.form, name='form'),
     path('dashboard', views.dashboard, name='dashboard'),
-    path('logout', views.logout, name='logout')
+    path('create_default_form_template/', views.create_default_form_template, name='create_default_form_template'),
+    path('logout', views.logout, name='logout'),
 ]
