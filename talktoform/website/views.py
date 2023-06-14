@@ -35,7 +35,7 @@ def signup(request):
                 messages.info(request, 'Email Already Registered')
                 return redirect('signup')
             else:
-                user = User.objects.create_user(email=email, password=password)
+                user = User.objects.create_user(username=email, email=email, password=password)
                 user.save()
                 return redirect('index')
         else:

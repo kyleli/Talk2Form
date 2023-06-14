@@ -27,8 +27,15 @@ h2 {
 
 .error-message {
   color:red;
-  max-width: 300px;
+  max-width: 500px;
   text-align: center;
+  margin: 0 auto;
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  outline: red solid 1px;
+  background-color: rgb(228, 199, 199);
+  box-sizing: border-box;
 }
 
 .header {
@@ -58,6 +65,7 @@ h2 {
   margin-bottom: 10px;
   box-sizing: border-box;
   border: 0;
+  border-width: 0;
   box-shadow: 0 0 15px 4px rgba(0, 0, 0, 0.06);
 }
 
@@ -81,6 +89,7 @@ h2 {
   text-align: center;
   text-decoration: none;
   font-weight: 500;
+  border: 0;
   box-sizing: border-box;
 }
 
@@ -94,12 +103,13 @@ h2 {
   padding: 10px;
   text-align: center;
   margin-top: 20px;
-  max-width: 300px; /* Set your desired max-width value */
+  max-width: 400px; /* Set your desired max-width value */
   margin-left: auto;
   margin-right: auto;
   font-weight: 300;
   word-wrap: break-word;
-
+  border-radius: 10px;
+  box-sizing: border-box;
 }
 
 /* Bottom Bar Icons */
