@@ -1,0 +1,27 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Talk2Form Sign Up Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <h1>Request Access</h1>
+    </div>
+    <div class="form-container">
+        <div class="form-field">
+            <input type="email" placeholder="Email">
+        </div>
+        <div class="form-field">
+            <input type="password" placeholder="Password">
+        </div>
+        <div class="form-field">
+            <input type="password" placeholder="Confirm Password">
+        </div>
+        <a class="login-button" href="#">Submit</a>
+    </div>
+</body>
+</html>

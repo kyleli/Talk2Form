@@ -1,0 +1,62 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Talk2Form Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="form-container">
+        <div class="question-form-header">
+            <span>Your Title</span>
+            <i class="ph ph-pencil-simple"></i>
+        </div>
+        <div class="combined-form">
+            <div class="question-form">
+                <span>Enter Your Question</span>
+                <a class="form-edit" href="#">
+                    <i class="ph-bold ph-pencil-simple"></i>
+                </a>
+            </div>
+            <div class="response-box"></div>
+        </div>
+        <div class="combined-form">
+            <div class="question-form editing">
+                <span>Editing Mode</span>
+                <a class="form-edit" href="#">
+                    <i class="ph-bold ph-floppy-disk"></i>
+                </a>
+            </div>
+            <div class="response-box"></div>
+        </div>
+        <div class="combined-form">
+            <div class="question-form">
+                <span>Response Mode</span>
+                <a class="form-edit" href="#">
+                    <i class="ph-bold ph-pencil-simple"></i>
+                </a>
+            </div>
+            <div class="response-box">Processing...</div>
+        </div>
+        <div class="combined-form">
+            <div class="question-form">
+                <span>How long has the patient experienced their symptoms for?</span>
+                <a class="form-edit" href="#">
+                    <i class="ph-bold ph-pencil-simple"></i>
+                </a>
+            </div>
+            <div class="response-box">It started last week in their right ear and began to bleed when they were sleeping in bed.</div>
+        </div>
+    </div>
+</body>
+<footer>
+    <div class="bottom-icons">
+        <a class="icon" href="#"><i class="ph ph-sign-out"></i></a>
+        <a class="icon center-icon" href="#"><i class="ph-fill ph-microphone"></i></a>
+        <a class="icon" href="#"><i class="ph ph-sliders"></i></a>
+    </div>
+</footer>
+</html>

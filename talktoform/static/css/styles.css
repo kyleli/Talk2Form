@@ -1,0 +1,265 @@
+/* styles.css */
+html, body
+{
+    margin: 0;
+    padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #E7ECEB;
+  color: #242426;
+}
+
+.light {
+  font-weight: 300;
+}
+
+h1 {
+  font-weight: 500;
+  font-size: 60px;
+}
+
+h2 {
+  font-weight: 300;
+  font-size: 24px;
+}
+
+.header {
+  text-align: center;
+  background-color: #3B4FB6;
+  padding: 10px;
+  border-radius: 0 0 10px 10px;
+}
+
+.header h1 {
+  color: white;
+}
+
+.form-container {
+  margin: 20px auto;
+  max-width: 300px;
+}
+
+.form-field input[type="text"],
+.form-field input[type="email"],
+.form-field input[type="password"] {
+  width: 100%;
+  font-size: 24px;
+  border: 3px solid #3B4FB6;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  border: 0;
+  box-shadow: 0 0 15px 4px rgba(0, 0, 0, 0.06);
+}
+
+.form-field label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.login-button,
+.request-button,
+.settings-button {
+  display: block;
+  font-size: 24px;
+  width: 100%;
+  background-color: #3B4FB6;
+  color: #F4F7F8;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+
+.request-button {
+  background-color: #CFD6FF;
+  color: #3B4FB6;
+}
+
+.text-area {
+  background-color: #F4F7F8;
+  padding: 10px;
+  text-align: center;
+  margin-top: 20px;
+  max-width: 300px; /* Set your desired max-width value */
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 300;
+  word-wrap: break-word;
+
+}
+
+/* Bottom Bar Icons */
+
+.bottom-icons {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 505px;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  color: #242426;
+  text-decoration: none;
+  margin: 0 30px; /* Add margin for spacing */
+}
+
+.center-icon {
+  background-color: #3B4FB6;
+  color: white;
+  width: 60px;
+  height: 60px;
+}
+
+.icon i {
+  font-size: 30px;
+}
+
+.icon center-i {
+  font-size: 35px;
+}
+
+/* Bottom Bar Icons End */
+
+/* Form Link Buttons */
+
+.dashboard-container {
+  margin: 20px auto;
+  max-width: 500px;
+}
+
+.form-link {
+  display: flex;
+  align-items: center; /* Vertically center items */
+  justify-content: space-between; /* Horizontally align items */
+  background-color: white;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  font-size: 42px;
+  font-weight: 300;
+}
+
+/* Form Link Buttons End */
+
+/* Form Start */
+
+.form-container {
+  margin: 20px auto;
+  max-width: 500px;
+}
+
+.question-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  font-size: 42px;
+  font-weight: 300;
+}
+
+.question-form-header i {
+  font-size: 20px;
+  background-color: #3B4FB6;
+  color: white;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 50%;
+}
+
+.question-form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #3B4FB6;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px 10px 0 0;
+  text-decoration: none;
+  margin-bottom: 0;
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.editing {
+  background-color: white;
+  border: 3px dotted #3B4FB6;
+  color:#242426;
+  padding: 10px 20px;
+  border-radius: 10px 10px 0 0;
+  text-decoration: none;
+  margin-bottom: 0;
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.question-form.editing i {
+  font-size: 20px;
+  background-color:#3B4FB6;
+  color: white;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 50%;
+}
+
+.question-form i {
+  font-size: 20px;
+  background-color: white;
+  color: #3B4FB6;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 50%;
+}
+
+.response-box {
+  background-color: white;
+  border: 3px solid #3B4FB6;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 10px 20px;
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.combined-form {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+.form-edit {
+  text-decoration: none;
+}
+
+/* Form End */
