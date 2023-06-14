@@ -11,16 +11,20 @@
     <div class="header">
         <h1><b>Talk</b><span class="light">2</span><b>Form</b></h1>
     </div>
-    <div class="form-container">
+    <form action="/" method="POST" class="form-container">
+        {% for message in messages %}
+        <p class="error-message">{{message}}</p>
+        {% endfor %}
+        {% csrf_token %}
         <div class="form-field">
-            <input type="email" placeholder="Email">
+            <input type="email" placeholder="Email" name="email">
         </div>
         <div class="form-field">
-            <input type="password" placeholder="Password">
+            <input type="password" placeholder="Password" name="password">
         </div>
-        <a class="login-button" href="#">Login</a>
-        <a class="request-button" href="#">Request Access</a>
-    </div>
+        <input type="submit" class="login-button" value="Login">
+        <a class="request-button" href="signup">Request Access</a>
+    </form>
     <div class="text-area">
         <h2>What is TalkToForm?</h2>
         <p>Streamline data entry: Record and convert conversations into auto-filled forms with AI-powered language prompts.</p>

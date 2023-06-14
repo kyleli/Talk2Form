@@ -6,11 +6,27 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
 from django.http import HttpResponse
 
+
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
 
-from django.contrib.auth.password_validation import validate_password
+        user = auth.authenticate(username=email, password=password)
+
+        if user is not None:
+            auth.login(request, user)
+            return redirect('dashboard')
+        else:
+            messages.info(request, 'Incorrect username or password.')
+            return redirect('index')
+    else:
+        return render(request, 'index.html')
+
+def logout(request):
+    auth.logout(request)
+    return redirect('/')
 
 def signup(request):
     if request.method == 'POST':
