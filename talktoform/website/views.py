@@ -77,7 +77,7 @@ def editform(request, form_id):
     for question in questions:
         question_list.append(question.question)
 
-        return render(request, 'editform.html', {'form_template': form_template, 'questions': question_list})
+    return render(request, 'editform.html', {'form_template': form_template, 'questions': question_list})
 
 
 
