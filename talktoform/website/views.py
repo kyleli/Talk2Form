@@ -125,3 +125,31 @@ def create_question(request, form_id):
         Question.objects.create(template=template, question=title)
         return redirect('editform', form_id=form_id)
     return redirect('editform', form_id=form_id)
+
+@login_required
+def edit_question(request, form_id, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    form_template = get_object_or_404(FormTemplate, id=form_id)
+    if form_template.user != request.user:
+        return HttpResponseForbidden("You don't have permission to edit this form.")
+
+    if request.method == 'POST':
+        question.question = request.POST.get('question')
+        question.save()
+        return redirect('editform', form_id=form_template.id)
+
+    return render(request, 'editform.html', {'form_template': form_template, 'question': question, 'editing': True})
+
+@login_required
+def save_question(request, form_id, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    form_template = get_object_or_404(FormTemplate, id=form_id)
+    if form_template.user != request.user:
+        return HttpResponseForbidden("You don't have permission to save this form.")
+
+    if request.method == 'POST':
+        question.question = request.POST.get('question')
+        question.save()
+        return redirect('editform', form_id=form_template.id)
+
+    return HttpResponseBadRequest("Invalid request method.")

@@ -24,15 +24,24 @@
                 </a>
             {% endif %}
         </div>
-        {% for question in questions %}
+        {% for question in form_template.question_set.all %}
         <div class="combined-form">
             <div class="question-form">
-                <span>{{ question.title }}</span>
-                <a class="form-edit" href="#">
-                    <i class="ph-bold ph-pencil-simple"></i>
-                </a>
+                {% if editing %}
+                    <form method="POST" action="{% url 'save_question' form_template.id question.id %}">
+                        {% csrf_token %}
+                        <input class="question-editing" type="text" name="question" value="{{ question.question }}" autofocus>
+                        <button type="submit">Save</button>
+                    </form>
+                {% else %}
+                    <span>{{ question.question }}</span>
+                    <a class="form-edit" href="{% url 'edit_question' form_template.id question.id %}">
+                        <i class="ph-bold ph-pencil-simple"></i>
+                    </a>
+                {% endif %}
             </div>
             <div class="response-box"></div>
+        </div>
         {% endfor %}
     </div>
 </body>
