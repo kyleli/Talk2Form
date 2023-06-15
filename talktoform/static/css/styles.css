@@ -25,6 +25,8 @@ h2 {
   font-size: 24px;
 }
 
+/* Start Status Messages */
+
 .error-message {
   color:red;
   max-width: 500px;
@@ -38,6 +40,22 @@ h2 {
   background-color: rgb(228, 199, 199);
   box-sizing: border-box;
 }
+
+.success-message {
+  color:#57a06f;
+  max-width: 500px;
+  text-align: center;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  outline: #57a06f solid 1px;
+  background-color: rgb(240 254 246);
+  box-sizing: border-box;
+}
+
+/* End Status Messages */
 
 .header {
   text-align: center;
@@ -283,6 +301,10 @@ h2 {
 }
 
 .form-edit {
+  text-decoration: none;
+}
+
+.question-form-header a {
   text-decoration: none;
 }
 

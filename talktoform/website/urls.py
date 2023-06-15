@@ -5,8 +5,11 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('signup', views.signup, name='signup'),
     path('usersettings', views.usersettings, name='usersettings'),
-    path('form', views.form, name='form'),
+    path('editform/<int:form_id>/', views.editform, name='editform'),
     path('dashboard', views.dashboard, name='dashboard'),
     path('create_default_form_template/', views.create_default_form_template, name='create_default_form_template'),
     path('logout', views.logout, name='logout'),
+    path('editform/<int:form_id>/edit_title/', views.edit_template_title, name='edit_template_title'),
+    path('editform/<int:form_id>/save_title/', views.save_template_title, name='save_template_title'),
+    path('create_question/<int:form_id>/', views.create_question, name='create_question'),
 ]

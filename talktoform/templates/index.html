@@ -13,7 +13,15 @@
     </div>
     <form action="/" method="POST" class="form-container">
         {% for message in messages %}
-        <p class="error-message">{{message}}</p>
+            {% if message.tags %} {# check if message has tags #}
+                {% if message.tags == 'success' %}
+                    <p class="success-message">{{ message }}</p>
+                {% elif message.tags == 'error' %}
+                    <p class="error-message">{{ message }}</p>
+                {% endif %}
+            {% else %}
+                <p class="error-message">{{ message }}</p>
+            {% endif %}
         {% endfor %}
         {% csrf_token %}
         <div class="form-field">
