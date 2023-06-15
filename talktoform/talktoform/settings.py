@@ -127,3 +127,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/'
 AUTH_USER_MODEL = 'website.User'
+
+MEDIA_ROOT = 'D:/Programming Practice/WhichDoctor/talktoform/media/'
+MEDIA_URL = '/media/'

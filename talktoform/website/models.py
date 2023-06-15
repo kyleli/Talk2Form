@@ -21,7 +21,7 @@ class Form(models.Model):
 class Question(models.Model):
     template = models.ForeignKey(FormTemplate, on_delete=models.CASCADE)
     question = models.CharField(max_length=255)
-
+    editing = models.BooleanField(default=False)
 
 class FormResponse(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE)
@@ -31,4 +31,4 @@ class FormResponse(models.Model):
 
 class AudioFile(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE)
-    file_path = models.CharField(max_length=255)
+    audio_file = models.FileField(upload_to='audio_files/', default=None)

@@ -4,14 +4,14 @@ import os
 CONVERSATION_TYPE = "A Hospital Visit"
 LANGUAGE = "English"
 WHISPER_MODEL_ID = 'whisper-1'
-AUDIO_PATH = 'output.mp3'
+AUDIO_PATH = 'CLI-version/output.mp3'
 
 # GPT Config
 MODEL_ID = 'gpt-3.5-turbo'
 TEMPERATURE = 0.2
 PRESENCE_PENALTY = -0.2
 MAX_TOKENS = 4096
-TRANSCRIPT_PATH = 'transcript.txt'
+TRANSCRIPT_PATH = 'CLI-version/transcript.txt'
 SYSTEM_PROMPT = """
     You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form queries.
     - The dialogue you are provided will consist of a conversation between a doctor and a patient. 
@@ -21,7 +21,7 @@ SYSTEM_PROMPT = """
     """
 
 # Form Config
-FORM_PATH = 'debug_examples/full_form_single_line.txt'
+FORM_PATH = 'CLI-version/debug_examples/full_form_single_line.txt'
 
 # API Key
 API_KEY = os.environ.get('OPENAI_API_KEY') # Change me to your OpenAI API key
@@ -34,6 +34,6 @@ CUSTOM_QUERIES = True
 
 # DEBUGGING EXAMPLE FILES
 ENABLE_DEBUG_TRANSCRIPT = False
-DEBUG_TRANSCRIPT_PATH = 'debug_examples/sample_transcript_2.txt'
+DEBUG_TRANSCRIPT_PATH = 'CLI-version/debug_examples/sample_transcript_2.txt'
 ENABLE_DEBUG_AUDIO = False
-DEBUG_AUDIO_PATH = 'debug_examples/64kbps_sample.mp3'
+DEBUG_AUDIO_PATH = 'CLI-version/debug_examples/64kbps_sample.mp3'

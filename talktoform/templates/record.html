@@ -1,0 +1,39 @@
+<body>
+    <h1>Record Audio</h1>
+    <button id="recordButton" onclick="startRecording()">Start Recording</button>
+    <button id="stopButton" onclick="stopRecording()">Stop Recording</button>
+    <audio id="audioPlayer" controls></audio>
+
+    <script>
+        var mediaRecorder;
+        var chunks = [];
+
+        function startRecording() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function (stream) {
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+                    chunks = [];
+
+                    mediaRecorder.addEventListener('dataavailable', function (event) {
+                        chunks.push(event.data);
+                    });
+                })
+                .catch(function (error) {
+                    console.error('Error accessing microphone:', error);
+                });
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+
+                mediaRecorder.addEventListener('stop', function () {
+                    var blob = new Blob(chunks, { type: 'audio/wav' });
+                    var audioPlayer = document.getElementById('audioPlayer');
+                    audioPlayer.src = URL.createObjectURL(blob);
+                });
+            }
+        }
+    </script>
+</body>

@@ -14,4 +14,6 @@ urlpatterns = [
     path('create_question/<int:form_id>/', views.create_question, name='create_question'),
     path('editform/<int:form_id>/edit_question/<int:question_id>/', views.edit_question, name='edit_question'),
     path('editform/<int:form_id>/save_question/<int:question_id>/', views.save_question, name='save_question'),
+    path('record/<int:form_template_id>/', views.record_view, name='record'),
+
 ]

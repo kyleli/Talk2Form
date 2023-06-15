@@ -6,7 +6,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
-from .models import FormTemplate, User, Question
+from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile
 
 # Create your views here.
 def index(request):
@@ -78,8 +78,6 @@ def editform(request, form_id):
         question_list.append(question.question)
 
     return render(request, 'editform.html', {'form_template': form_template, 'questions': question_list})
-
-
 
 @login_required
 def dashboard(request):
@@ -153,3 +151,7 @@ def save_question(request, form_id, question_id):
         return redirect('editform', form_id=form_template.id)
 
     return HttpResponseBadRequest("Invalid request method.")
+
+@login_required
+def record_view(request, form_template_id):
+    return render(request, 'record.html')

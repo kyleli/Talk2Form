@@ -112,6 +112,10 @@ h2 {
   box-sizing: border-box;
 }
 
+.settings-button.danger {
+  background-color: rgb(209, 71, 71);
+}
+
 .request-button {
   background-color: #CFD6FF;
   color: #3B4FB6;
@@ -306,6 +310,7 @@ h2 {
 
 .question-form-header a {
   text-decoration: none;
+  height: 60px;
 }
 
 /* Form End */

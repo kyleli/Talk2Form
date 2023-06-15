@@ -12,9 +12,9 @@ def main():
 
     if ENABLE_WHISPER:
         if ENABLE_DEBUG_AUDIO:
-            whisper.convert_audio(API_KEY, DEBUG_AUDIO_PATH)
+            whisper.convert_audio(API_KEY, DEBUG_AUDIO_PATH, TRANSCRIPT_PATH)
         else:
-            whisper.convert_audio(API_KEY, AUDIO_PATH)
+            whisper.convert_audio(API_KEY, AUDIO_PATH, TRANSCRIPT_PATH)
     else:
         print("Whisper Disabled")
 
