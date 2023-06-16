@@ -3,7 +3,6 @@ import wave
 import keyboard
 import time
 from pydub import AudioSegment
-from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from ..models import AudioFile, Form
 
@@ -32,27 +31,14 @@ def record_audio(form_id, filename, chunk=1024, channels=1, rate=44100, format=p
 
     frames = []
     recording = False
-    key_pressed = False
-
-    print("Press 'r' to start/pause recording, and press 'esc' to stop recording and save the file.")
 
     while True:
-        if keyboard.is_pressed('esc'):
-            break
-
-        if keyboard.is_pressed('r') and not key_pressed:
-            recording = not recording
-            key_pressed = True
-            print("Recording..." if recording else "Recording paused.")
-            time.sleep(0.25)
-        elif not keyboard.is_pressed('r'):
-            key_pressed = False
-
         if recording:
             data = stream.read(chunk)
             frames.append(data)
 
-    print("Recording stopped and saving...")
+        if not recording:
+            break
 
     stream.stop_stream()
     stream.close()
@@ -66,10 +52,16 @@ def record_audio(form_id, filename, chunk=1024, channels=1, rate=44100, format=p
         channels=channels
     )
 
-    # Export audio segment as an MP3 file
-    path = f"audio_files/{filename}"  # The file will be saved in media/audio_files/
-    temp_file = default_storage.save(path, ContentFile(audio_segment.export(format="mp3", bitrate="64k").read()))
+    # Export audio segment as MP3 byte string
+    audio_byte_string = audio_segment.export(format="mp3", bitrate="64k").getvalue()
 
-    # Save the audio file path to the database
-    audio_file = AudioFile(form_id=form_id, audio_file=temp_file)
+    # Get the associated form
+    form = Form.objects.get(pk=form_id)
+
+    # Create a new AudioFile instance
+    audio_file = AudioFile(form=form, audio_file=ContentFile(audio_byte_string, filename))
     audio_file.save()
+
+
+
+
