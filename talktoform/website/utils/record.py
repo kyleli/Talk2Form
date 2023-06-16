@@ -5,7 +5,7 @@ import time
 from pydub import AudioSegment
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from ..models import AudioFile, Form
+from ..models import AudioFile
 
 def record_audio(form_id, filename, chunk=1024, channels=1, rate=44100, format=pyaudio.paInt16):
     """

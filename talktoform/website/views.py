@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile
-from utils.record import record_audio
+from .utils.record import record_audio
 
 # Create your views here.
 def index(request):
@@ -153,15 +153,31 @@ def save_question(request, form_template_id, question_id):
 
     return HttpResponseBadRequest("Invalid request method.")
 
+def create_form(request, template_id):
+    template = get_object_or_404(FormTemplate, pk=template_id)
+    user = request.user  # Assuming the user is authenticated
+
+    # Create a new Form linked to the template and the user
+    form = Form.objects.create(template=template, user=user)
+
+    # Retrieve all the questions associated with the template
+    questions = Question.objects.filter(template=template)
+
+    # Create a FormResponse for each question
+    for question in questions:
+        FormResponse.objects.create(form=form, question=question)
+    
+    responses = FormResponse.objects.filter(form=form)
+    # Redirect to the newly created form's page or render a success message
+    # redirect to record form
+    return render(request, 'record.html', {'form': form, 'responses': responses})
+
 @login_required
-def record_view(request, form_template_id):
+def record_form(request, form_id):
     if request.method == 'POST':
         form_id = request.POST.get('form_id')
-        audio_data = request.FILES.get('audio_data')
-        record_audio(form_id=form_id)
-        audio_file = AudioFile(form_id=form_id, audio_file=audio_data)
-        audio_file.save()
+        record_audio(form_id=form_id, filename=f"{form_id}.mp3")
 
         return redirect('form_template_detail', form_template_id=form_id)
 
-    return render(request, 'record.html', {'form_template_id': form_template_id})
+    return render(request, 'record.html', {'form_template_id': form_id})

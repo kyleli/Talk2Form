@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Created</title>
+</head>
+<body>
+    <h1>Form Created Successfully</h1>
+    <p>Form ID: {{ form.id }}</p>
+    <p>Template: {{ form.template }}</p>
+    {% for response in responses %}
+    <p>{{ response.question.question }}</p>
+    <p>{{ response.response }}</p>
+    {% endfor %}
+    <!-- Add any additional information or links as needed -->
+</body>
+</html>

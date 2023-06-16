@@ -52,7 +52,7 @@
             {% csrf_token %}
             <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph ph-plus"></i></a>
         </form>
-        <a class="icon" href="{% url 'record' form_template.id %}"><i class="ph ph-microphone"></i></a>
+        <a class="icon" href="{% url 'create_form' form_template.id %}"><i class="ph ph-microphone"></i></a>
     </div>
 </footer>
 </html>
