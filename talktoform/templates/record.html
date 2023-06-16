@@ -1,7 +1,12 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Form Created</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 </head>
 <body>
     <h1>Form Created Successfully</h1>
@@ -11,20 +16,20 @@
     <p>{{ response.question.question }}</p>
     <p>{{ response.response }}</p>
     {% endfor %}
-    {% if recording %}
-    <form method="POST" class="center-button-form" action="{% url 'pause' form.id %}">
-        {% csrf_token %}
-        <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-pause"></i></a>
-    </form>
-    {% else %}
-    <form method="POST" class="center-button-form" action="{% url 'resume' form.id %}">
-        {% csrf_token %}
-        <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-microphone"></i></a>
-    </form>
-    <form method="POST" class="center-button-form" action="{% url 'save' form.id %}">
-        {% csrf_token %}
-        <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-floppy-disk"></i></a>
-    </form>
-    {% endif %}
+    <p>Recording: {{ is_recording }} Paused: {{ is_paused }}</p>
+    <div class="bottom-icons">
+        <form method="POST" class="center-button-form" action="{% url 'start_record_api' form.id %}">
+            {% csrf_token %}
+            <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-microphone"></i></a>
+        </form>
+        <form method="POST" class="center-button-form" action="{% url 'stop_record_api' form.id %}">
+            {% csrf_token %}
+            <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-floppy-disk"></i></a>
+        </form>
+        <form method="POST" class="center-button-form" action="{% url 'pause_record_api' form.id %}">
+            {% csrf_token %}
+            <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-plus"></i></a>
+        </form>
+    </div>
 </body>
 </html>

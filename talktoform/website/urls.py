@@ -15,8 +15,8 @@ urlpatterns = [
     path('editform/<int:form_template_id>/edit_question/<int:question_id>/', views.edit_question, name='edit_question'),
     path('editform/<int:form_template_id>/save_question/<int:question_id>/', views.save_question, name='save_question'),
     path('create_form/<int:template_id>/', views.create_form, name='create_form'),
-    path('record/<int:form_id>/', views.record_form, name='record'),
-    path('resume/<int:form_id>/', views.resume, name='resume'),
-    path('pause/<int:form_id>/', views.pause, name='pause'),
-    path('save/<int:form_id>/', views.save, name='save'),
+    #path('record/<int:form_id>/', views.record_form, name='record'),
+    path('start_record_api/<int:form_id>/', views.start_record_api, name='start_record_api'),
+    path('stop_record_api/<int:form_id>/', views.stop_record_api, name='stop_record_api'),
+    path('pause_record_api/<int:form_id>/', views.pause_record_api, name='pause_record_api'),
 ]

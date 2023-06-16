@@ -7,7 +7,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile
-from .utils.record import record_audio, stop_recording_loop, pause_recording_loop, start_recording_loop
+from .utils.record import stop_recording, start_recording, is_recording, toggle_pause_recording, paused
+from django.http import JsonResponse
 
 # Create your views here.
 def index(request):
@@ -170,36 +171,40 @@ def create_form(request, template_id):
     responses = FormResponse.objects.filter(form=form)
     # Redirect to the newly created form's page or render a success message
     # redirect to record form
-    return render(request, 'record.html', {'form': form, 'responses': responses})
+    return render(request, 'record.html', {'form': form, 'responses': responses, 'is_recording': is_recording, 'is_paused': paused})
 
-@login_required
-def record_form(request, form_id):
+#@login_required
+#def record_form(request, form_id):
+#    return render(request, 'record.html', {'form_id': form_id})
+
+def start_record_api(request, form_id):
     if request.method == 'POST':
-        form_id = request.POST.get('form_id')
-        record_audio(form_id=form_id, filename=f"{form_id}.mp3")
+        start_recording(form_id=form_id, filename=f"{form_id}.mp3")
+        form = Form.objects.get(id=form_id)
+        responses = FormResponse.objects.filter(form_id=form)
+    return render(request, 'record.html', {'form': form, 'responses': responses, 'is_recording': is_recording, 'is_paused': paused})
 
-        return redirect('response_form', form_template_id=form_id)
-
-    return render(request, 'record.html', {'form_id': form_id, 'recording': False})
-
-def resume(request, form_id):
+def stop_record_api(request, form_id):
     if request.method == 'POST':
-        start_recording_loop()
+        stop_recording()
+        form = Form.objects.get(id=form_id)
+        responses = FormResponse.objects.filter(form_id=form)
+        print(responses)
+    return render(request, 'record.html', {'form': form, 'responses': responses, 'is_recording': is_recording, 'is_paused': paused})
 
-def pause(request, form_id):
+def pause_record_api(request, form_id):
     if request.method == 'POST':
-        pause_recording_loop()
-
-def save(request, form_id):
-    if request.method == 'POST':
-        stop_recording_loop()
+        toggle_pause_recording()
+        form = Form.objects.get(id=form_id)
+        responses = FormResponse.objects.filter(form_id=form)
+        print(responses)
+    return render(request, 'record.html', {'form': form, 'responses': responses, 'is_recording': is_recording, 'is_paused': paused})
 
 def response_form(request, form_id):
     form = get_object_or_404(Form, id=form_id)
     if form.user != request.user: # Only the forms attached to the user can be accessed
         return HttpResponseForbidden("You don't have permission to access this form.")
 
-    questions = Question.objects.filter(template=form.template)
     responses = FormResponse.objects.filter(templates=form.template)
 
     question_list = []
