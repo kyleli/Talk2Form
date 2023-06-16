@@ -5,7 +5,7 @@ from .models import Form, AudioFile, User, FormTemplate, Question, FormResponse
 
 class AudioRecordingTestCase(TestCase):
     def test_audio_recording(self):
-        user = User.objects.create(username='example_user', email='kyle@gmail.com', password='01Olaman')
+        user = User.objects.create(username='example_user', email='example@example.com', password='12345asdfg')
         formtemplate = FormTemplate.objects.create(title='Okay', body='Body', user=user)
         form = Form.objects.create(template=formtemplate, user=user)
 

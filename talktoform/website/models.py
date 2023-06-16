@@ -64,6 +64,8 @@ class FormResponse(models.Model):
 class AudioFile(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE)
     audio_file = models.FileField(storage=default_storage, upload_to='audio_files/', default=None)
+    transcript = models.TextField(default="")
+
     def __str__(self):
         return f"AudioFile ID: {self.id} | User: {self.form.template.user.username} | Form: {self.form.template.title} #{self.form.form_template_id} | Audio: {self.audio_file}"
 
