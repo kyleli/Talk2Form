@@ -26,4 +26,8 @@ This is what it needs to do.
 
 
 Need to now link a new audio thing with the new form. The audio button should call the new audio thing to start recording.
-The user needs to be able to click record to re-record on the form if needed but right now we're implementing 
+The user needs to be able to click record to re-record on the form if needed but right now we're implementing.
+
+Look into server side events or websockets (Ideally Websocket)
+- Push from server into the site
+- Pulling is easier to implement but loops

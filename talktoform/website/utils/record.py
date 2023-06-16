@@ -1,63 +1,64 @@
 import pyaudio
+import wave
+import threading
+import time
 from pydub import AudioSegment
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from ..models import AudioFile
 
-stop_recording = False
-pause_recording = False
+# Global variables
+CHUNK = 1024
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 44100
 
-def record_audio(form_id, filename, chunk=1024, channels=1, rate=44100, format=pyaudio.paInt16):
-    """
-    Records audio from the default microphone and saves it to the database as an MP3 file.
+frames = []
+is_recording = False
+paused = False
 
-    Args:
-    - form_id (int): The ID of the form associated with the audio file.
-    - filename (str): The name of the output file.
-    - chunk (int): The number of audio frames per buffer.
-    - channels (int): The number of audio channels (1 for mono, 2 for stereo).
-    - rate (int): The sampling rate of the audio.
-    - format (int): The format of the audio data.
+def start_recording(form_id, filename):
+    if not is_recording:
+    print("starting recording")
+    global is_recording
+    global frames
+    global paused
+    is_recording = True
 
-    Returns:
-    - None
-    """
     p = pyaudio.PyAudio()
-
-    stream = p.open(format=format,
-                    channels=channels,
-                    rate=rate,
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
                     input=True,
-                    frames_per_buffer=chunk)
+                    frames_per_buffer=CHUNK)
 
-    frames = []
-    recording = False
-
-    print("Press 'r' to start/pause recording, and press 'esc' to stop recording and save the file.")
-
-    while not stop_recording:
-        if stop_recording:
-            break
-
-        if pause_recording:
-            recording = not recording
-
-        if recording:
-            data = stream.read(chunk)
+    # Start the thread for saving audio chunks
+    #save_thread = threading.Thread(target=save_audio_chunks, args=(stream,))
+    #save_thread.start()
+    while is_recording:
+        data = stream.read(CHUNK)
+        if not paused:
             frames.append(data)
+            print("chunking")
 
-    print("Recording stopped and saving...")
+    # Record audio until is_recording is True
+    stream.start_stream()
 
+    # Wait for the save thread to finish and stop recording
+    #save_thread.join()
+    print("thread closes")
+    # Clean up resources
     stream.stop_stream()
     stream.close()
     p.terminate()
+    print("p terminates")
 
     # Convert frames to AudioSegment
     audio_segment = AudioSegment(
         b''.join(frames),
-        frame_rate=rate,
-        sample_width=p.get_sample_size(format),
-        channels=channels
+        frame_rate=RATE,
+        sample_width=p.get_sample_size(FORMAT),
+        channels=CHANNELS
     )
 
     # Export audio segment as an MP3 file
@@ -67,15 +68,14 @@ def record_audio(form_id, filename, chunk=1024, channels=1, rate=44100, format=p
     # Save the audio file path to the database
     audio_file = AudioFile(form_id=form_id, audio_file=temp_file)
     audio_file.save()
+    frames = []
 
-def stop_recording_loop():
-    global stop_recording
-    stop_recording = True
+def stop_recording():
+    print("stopping recording")
+    global is_recording
+    is_recording = False
 
-def pause_recording_loop():
-    global pause_recording
-    pause_recording = True
-
-def start_recording_loop():
-    global pause_recording
-    pause_recording = False
+def toggle_pause_recording():
+    print("pause/unpausing")
+    global paused
+    paused = not paused
