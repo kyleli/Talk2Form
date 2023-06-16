@@ -10,7 +10,7 @@ class AudioRecordingTestCase(TestCase):
         form = Form.objects.create(template=formtemplate, user=user)
 
         # Call the record_audio function with test parameters
-        record_audio(form_id=form.id, filename='9.mp3')
+        record_audio(form_id=form.id, filename=f'{form.id}.mp3')
 
         # Add assertions to check if the audio file was saved correctly
         # For example, you can check if an AudioFile object was created for the form:

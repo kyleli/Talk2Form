@@ -5,12 +5,26 @@
 </head>
 <body>
     <h1>Form Created Successfully</h1>
-    <p>Form ID: {{ form.id }}</p>
+    <p>Form ID: {{ form }}</p>
     <p>Template: {{ form.template }}</p>
     {% for response in responses %}
     <p>{{ response.question.question }}</p>
     <p>{{ response.response }}</p>
     {% endfor %}
-    <!-- Add any additional information or links as needed -->
+    {% if recording %}
+    <form method="POST" class="center-button-form" action="{% url 'pause' form.id %}">
+        {% csrf_token %}
+        <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-pause"></i></a>
+    </form>
+    {% else %}
+    <form method="POST" class="center-button-form" action="{% url 'resume' form.id %}">
+        {% csrf_token %}
+        <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-microphone"></i></a>
+    </form>
+    <form method="POST" class="center-button-form" action="{% url 'save' form.id %}">
+        {% csrf_token %}
+        <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-floppy-disk"></i></a>
+    </form>
+    {% endif %}
 </body>
 </html>

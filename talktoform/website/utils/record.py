@@ -1,11 +1,11 @@
 import pyaudio
-import wave
-import keyboard
-import time
 from pydub import AudioSegment
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from ..models import AudioFile
+
+stop_recording = False
+pause_recording = False
 
 def record_audio(form_id, filename, chunk=1024, channels=1, rate=44100, format=pyaudio.paInt16):
     """
@@ -32,21 +32,15 @@ def record_audio(form_id, filename, chunk=1024, channels=1, rate=44100, format=p
 
     frames = []
     recording = False
-    key_pressed = False
 
     print("Press 'r' to start/pause recording, and press 'esc' to stop recording and save the file.")
 
-    while True:
-        if keyboard.is_pressed('esc'):
+    while not stop_recording:
+        if stop_recording:
             break
 
-        if keyboard.is_pressed('r') and not key_pressed:
+        if pause_recording:
             recording = not recording
-            key_pressed = True
-            print("Recording..." if recording else "Recording paused.")
-            time.sleep(0.25)
-        elif not keyboard.is_pressed('r'):
-            key_pressed = False
 
         if recording:
             data = stream.read(chunk)
@@ -73,3 +67,15 @@ def record_audio(form_id, filename, chunk=1024, channels=1, rate=44100, format=p
     # Save the audio file path to the database
     audio_file = AudioFile(form_id=form_id, audio_file=temp_file)
     audio_file.save()
+
+def stop_recording_loop():
+    global stop_recording
+    stop_recording = True
+
+def pause_recording_loop():
+    global pause_recording
+    pause_recording = True
+
+def start_recording_loop():
+    global pause_recording
+    pause_recording = False

@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile
-from .utils.record import record_audio
+from .utils.record import record_audio, stop_recording_loop, pause_recording_loop, start_recording_loop
 
 # Create your views here.
 def index(request):
@@ -178,6 +178,34 @@ def record_form(request, form_id):
         form_id = request.POST.get('form_id')
         record_audio(form_id=form_id, filename=f"{form_id}.mp3")
 
-        return redirect('form_template_detail', form_template_id=form_id)
+        return redirect('response_form', form_template_id=form_id)
 
-    return render(request, 'record.html', {'form_template_id': form_id})
+    return render(request, 'record.html', {'form_id': form_id, 'recording': False})
+
+def resume(request, form_id):
+    if request.method == 'POST':
+        start_recording_loop()
+
+def pause(request, form_id):
+    if request.method == 'POST':
+        pause_recording_loop()
+
+def save(request, form_id):
+    if request.method == 'POST':
+        stop_recording_loop()
+
+def response_form(request, form_id):
+    form = get_object_or_404(Form, id=form_id)
+    if form.user != request.user: # Only the forms attached to the user can be accessed
+        return HttpResponseForbidden("You don't have permission to access this form.")
+
+    questions = Question.objects.filter(template=form.template)
+    responses = FormResponse.objects.filter(templates=form.template)
+
+    question_list = []
+    response_list = []
+    for response in responses:
+        question_list.append(response.question)
+        response_list.append(response.response)
+
+    return render(request, 'editform.html', {'form': form, 'questions': question_list, 'responses': response_list})
