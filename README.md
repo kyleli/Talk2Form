@@ -27,3 +27,5 @@ Issues:
 
 
 Currently running in to 400 errors
+
+Theoretically I can just pass in the data as raw bytes in a frame buffer without storing it...?
