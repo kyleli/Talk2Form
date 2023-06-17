@@ -14,8 +14,6 @@ echo "Running 'collectstatic' command..."
 
 python manage.py collectstatic --noinput
 
-python manage.py makemigrations
+python3 manage.py makemigrations
 
-python manage.py migrate
-
-python create_superuser_script.py
+python3 manage.py migrate
