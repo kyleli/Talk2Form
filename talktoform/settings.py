@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'talktoform.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         # Feel free to alter this value to suit your needs.
-        default=os.environ.get('DATABASE_URL'),
+        default=os.environ.get('DATABASE_URL'), #'postgresql://postgres:postgres@localhost:5432/talktoformdb'
         conn_max_age=600
     )
     }
