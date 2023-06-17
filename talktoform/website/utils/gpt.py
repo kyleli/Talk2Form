@@ -1,26 +1,6 @@
 import openai
 import os
-
-def initialize_system_prompt(SYSTEM_PROMPT, TRANSCRIPT_PATH):
-    """
-    Initializes the conversations list with system instructions and transcript content.
-
-    Args:
-    - SYSTEM_PROMPT (str): The system prompt or instructions for the conversation.
-    - TRANSCRIPT_PATH (str): The path to the transcript file containing conversation content.
-
-    Returns:
-    - conversations (list): A list of conversation objects.
-      Each object represents a role and content in the conversation.
-    """
-    conversations = []
-    conversations.append({'role': 'system', 'content': SYSTEM_PROMPT})
-    
-    with open(TRANSCRIPT_PATH, 'r') as file:
-        transcript = file.read()
-    
-    conversations.append({'role': 'system', 'content': transcript})
-    return conversations
+from website.models import FormConfig, Form, Question, FormResponse, AudioFile
 
 def new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversation_log):
     """
@@ -48,13 +28,29 @@ def new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversation_log):
         'content': response.choices[0].message.content.strip()
     })
     
-    tokens = response.usage['total_tokens']
-    return tokens, conversation_log
+    return conversation_log
 
-def process_form_query(response, SYSTEM_PROMPT, TRANSCRIPT_PATH, MODEL_ID='gpt-3.5-turbo', TEMPERATURE=0.2, PRESENCE_PENALTY=-0.2):
+def process_form_query(form_response, audio_file):
     openai.api_key = os.environ.get('OPENAI_API_KEY')
-    initialize_system_prompt(SYSTEM_PROMPT, TRANSCRIPT_PATH)
+
+    # Get Transcript
+    TRANSCRIPT = audio_file.transcript
+
+    # Get FormConfig
+    form_template = form_response.form.template
+    form_config = form_template.formconfig
+    SYSTEM_PROMPT = form_config.system_prompt
+    MODEL_ID = form_config.ai_model_id
+    TEMPERATURE = float(form_config.temperature)
+    PRESENCE_PENALTY = float(form_config.presence_penalty)
+
+    # Get Question
+    question = form_response.question.question
+
     conversations = []
+    conversations.append({'role': 'system', 'content': SYSTEM_PROMPT})
+    conversations.append({'role': 'system', 'content': TRANSCRIPT})
     conversations.append({'role': 'user', 'content': question})
-    tokens, conversations = new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversations)
-    return f"{question} {conversations[-1]['content'].strip()}\n"
+    conversations = new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversations)
+    form_response.response = conversations[-1]['content'].strip()
+    form_response.save()

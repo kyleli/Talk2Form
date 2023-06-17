@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
 class User(AbstractUser):
@@ -74,7 +75,7 @@ def delete_audio_file(sender, instance, **kwargs):
     # Delete the file from the storage
     instance.audio_file.delete(save=False)
 
-class Settings(models.Model):
+class FormConfig(models.Model):
     AUDIO_RECOGNITION_MODEL_CHOICES = [
         ('whisper-1', 'whisper')
     ]
@@ -89,8 +90,8 @@ class Settings(models.Model):
     audio_recognition_model_id = models.CharField(max_length=255, choices=AUDIO_RECOGNITION_MODEL_CHOICES, default='whisper-1')
     system_prompt = models.TextField(default='')
     ai_model_id = models.CharField(max_length=255, choices=AI_MODEL_CHOICES, default='gpt-3.5-turbo')
-    temperature = models.DecimalField(max_digits=5, decimal_places=2, default=0.2)
-    presence_penalty = models.DecimalField(max_digits=5, decimal_places=2, default=-0.2)
+    temperature = models.DecimalField(max_digits=3, decimal_places=1, default=0.2, validators=[MaxValueValidator(2), MinValueValidator(-2)])
+    presence_penalty = models.DecimalField(max_digits=3, decimal_places=1, default=-0.2, validators=[MaxValueValidator(2), MinValueValidator(-2)])
 
     def __str__(self):
         return f"Settings for FormTemplate ID: {self.form_template.id}"

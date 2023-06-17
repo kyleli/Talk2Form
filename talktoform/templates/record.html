@@ -69,7 +69,8 @@
             body: formData
             })
             .then(function(response) {
-                // Handle server response
+                response.json().then(function(json){console.log(json)});
+                window.location.href = `/response_form/${formId}/`;
             })
             .catch(function(error) {
                 console.error('Error stopping audio:', error);

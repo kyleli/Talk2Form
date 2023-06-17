@@ -6,8 +6,10 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
-from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile, Settings
-from .utils import whisper, gpt
+
+from .utils import gpt
+from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile, FormConfig, FormConfig
+from .utils import whisper
 from django.http import JsonResponse
 from pydub import AudioSegment
 import os
@@ -100,13 +102,14 @@ def create_default_form_template(request):
         form_template = FormTemplate.objects.create(title=title, body=body, user=user)\
         
         # Create a Settings instance and attach it to the form_template, this is tailored towards medical but perhaps the user can select the default template type when they create in the future
-        Settings.objects.create(
+        FormConfig.objects.create(
             form_template=form_template,
             conversation_type='A Medical Visit Between a Patient and Doctor',
-            system_prompt='''You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form queries.
-            - The dialogue you are provided will consist of a conversation between a doctor and a patient. 
-            - You will take this information provided and fill out the following form and write "N/A" if you do not have information to factually fill out any information.
-            - The questions will be provided individually and you will answer one at a time.
+            system_prompt='''You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form query.
+            - The dialogue you are provided will consist of a conversation between a doctor and a patient.
+            - You will take this information provided and fill out the following form and write "N/A" if you do not have information to factually fill out the questions or interpret responses.
+            - You may interpret answers to the questions only using factual information stated in the transcript, do not fabricate any information.
+            - You will answer each question factually, as if you were filling out a form, and refrain from adding any additional commentary.
             - You will only answer the question and not write anything else. If you need more information or can not give a factual answer, write "N/A".''',
         )
 
@@ -171,6 +174,7 @@ def save_question(request, form_template_id, question_id):
 
     return HttpResponseBadRequest("Invalid request method.")
 
+@login_required
 def create_form(request, template_id):
     template = get_object_or_404(FormTemplate, pk=template_id)
     user = request.user  # Assuming the user is authenticated
@@ -190,6 +194,7 @@ def create_form(request, template_id):
     # redirect to record form
     return render(request, 'record.html', {'form': form, 'responses': responses})
 
+@login_required
 def upload_audio(request, form_id):
     if request.method == 'POST':
         form_data = request.POST
@@ -206,37 +211,36 @@ def upload_audio(request, form_id):
         return JsonResponse({'success': True})
     return HttpResponse('ok')
 
+@login_required
 def stop_audio(request, form_id):
     if request.method == 'POST':
         audio_dir = 'audio_files'
         audio_path = default_storage.path(f'{audio_dir}/form_{form_id}_audio.webm')  # Specify the path to the audio file
         audio_file = AudioFile(form_id=form_id, audio_file=audio_path)
         audio_file.save()
-
-        # go to each formresponse in the model
-        # preload the system prompt
-        # find the question
-        # get output and load into form response.response response.save()
-
+        
         whisper.convert_audio(audio_file)
+
+        # Delete the audio file
+        if default_storage.exists(audio_path):
+            default_storage.delete(audio_path)
+
+        form = Form.objects.get(id=form_id)
+        form_responses = form.formresponse_set.all()
+        for form_response in form_responses:
+            gpt.process_form_query(form_response, audio_file)
+        
         return JsonResponse({'success': True})
-        #return redirect('response_form', form_id)
         
     return JsonResponse({'success': False})
 
-
-
+@login_required
 def response_form(request, form_id):
     form = get_object_or_404(Form, id=form_id)
+    # have a setting to make form data public
     if form.user != request.user: # Only the forms attached to the user can be accessed
         return HttpResponseForbidden("You don't have permission to access this form.")
 
-    responses = FormResponse.objects.filter(templates=form.template)
+    form_responses = form.formresponse_set.all()
 
-    question_list = []
-    response_list = []
-    for response in responses:
-        question_list.append(response.question)
-        response_list.append(response.response)
-
-    return render(request, 'editform.html', {'form': form, 'questions': question_list, 'responses': response_list})
+    return render(request, 'responseform.html', {'form': form, 'responses': form_responses})
