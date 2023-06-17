@@ -26,4 +26,4 @@ Issues:
 - Many fail cases e.g. what happens if user records audio twice or hit GPT API limit.
 
 
-If database doesn't work, try deploying a test database to render and trying some stuff to troubleshoot.
+Currently running in to 400 errors
