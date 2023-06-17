@@ -21,3 +21,13 @@ python manage.py collectstatic --noinput
 python manage.py makemigrations
 
 python manage.py migrate
+
+python manage.py createsuperuser
+
+kyleseanli@gmail.com
+
+kyleseanli@gmail.com
+
+12345abcde
+
+12345abcde
