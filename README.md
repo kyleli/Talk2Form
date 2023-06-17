@@ -24,3 +24,6 @@ Issues:
 - No way to recover your password if you forget it (L)
 - No 2FA
 - Many fail cases e.g. what happens if user records audio twice or hit GPT API limit.
+
+
+If database doesn't work, try deploying a test database to render and trying some stuff to troubleshoot.
