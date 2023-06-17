@@ -17,3 +17,7 @@ python manage.py collectstatic --noinput
 python3 manage.py makemigrations
 
 python3 manage.py migrate
+
+echo "SHOWING MIGRATIONS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
+manage.py showmigrations
