@@ -51,7 +51,6 @@ class FormResponse(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     response = models.TextField(default="Processing...")
-
     def truncated_response(self):
         if len(self.response) > 50:
             return self.response[:50] + "..."
@@ -68,9 +67,30 @@ class AudioFile(models.Model):
 
     def __str__(self):
         return f"AudioFile ID: {self.id} | User: {self.form.template.user.username} | Form: {self.form.template.title} #{self.form.form_template_id} | Audio: {self.audio_file}"
-
-# If you run into Windows Fatal Exception: Access Violations when running 'python mnaage.py test', this is the reason it's trying to delete stuff the test doesn't have access to
+    
+# If you run into Windows Fatal Exception: Access Violations when running 'python manage.py test', this is the reason it's trying to delete stuff the test doesn't have access to
 @receiver(post_delete, sender=AudioFile)
 def delete_audio_file(sender, instance, **kwargs):
     # Delete the file from the storage
     instance.audio_file.delete(save=False)
+
+class Settings(models.Model):
+    AUDIO_RECOGNITION_MODEL_CHOICES = [
+        ('whisper-1', 'whisper')
+    ]
+    AI_MODEL_CHOICES = [
+        ('gpt-3.5-turbo', 'GPT-3.5'),
+        ('gpt-3.5-turbo-16k', 'GPT-3.5-16k'),
+        ('gpt4', 'GPT4'),
+    ]
+    form_template = models.OneToOneField('FormTemplate', on_delete=models.CASCADE)
+    language = models.CharField(max_length=255, default = 'english')
+    conversation_type = models.CharField(max_length=255, default='')
+    audio_recognition_model_id = models.CharField(max_length=255, choices=AUDIO_RECOGNITION_MODEL_CHOICES, default='whisper-1')
+    system_prompt = models.TextField(default='')
+    ai_model_id = models.CharField(max_length=255, choices=AI_MODEL_CHOICES, default='gpt-3.5-turbo')
+    temperature = models.DecimalField(max_digits=5, decimal_places=2, default=0.2)
+    presence_penalty = models.DecimalField(max_digits=5, decimal_places=2, default=-0.2)
+
+    def __str__(self):
+        return f"Settings for FormTemplate ID: {self.form_template.id}"

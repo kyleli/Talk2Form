@@ -6,11 +6,13 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
-from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile
-from .utils.record2 import stop_recording, start_recording, is_recording, toggle_pause_recording, paused
+from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile, Settings
+from .utils import whisper, gpt
 from django.http import JsonResponse
 from pydub import AudioSegment
 import os
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 
 # Create your views here.
@@ -95,7 +97,19 @@ def create_default_form_template(request):
         title = 'Untitled Form'
         body = 'Form description'
         user = request.user
-        FormTemplate.objects.create(title=title, body=body, user=user)
+        form_template = FormTemplate.objects.create(title=title, body=body, user=user)\
+        
+        # Create a Settings instance and attach it to the form_template, this is tailored towards medical but perhaps the user can select the default template type when they create in the future
+        Settings.objects.create(
+            form_template=form_template,
+            conversation_type='A Medical Visit Between a Patient and Doctor',
+            system_prompt='''You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form queries.
+            - The dialogue you are provided will consist of a conversation between a doctor and a patient. 
+            - You will take this information provided and fill out the following form and write "N/A" if you do not have information to factually fill out any information.
+            - The questions will be provided individually and you will answer one at a time.
+            - You will only answer the question and not write anything else. If you need more information or can not give a factual answer, write "N/A".''',
+        )
+
         return redirect('dashboard')
     return render(request, 'dashboard.html')
 
@@ -174,34 +188,7 @@ def create_form(request, template_id):
     responses = FormResponse.objects.filter(form=form)
     # Redirect to the newly created form's page or render a success message
     # redirect to record form
-    return render(request, 'record.html', {'form': form, 'responses': responses, 'is_recording': is_recording, 'is_paused': paused})
-
-#@login_required
-#def record_form(request, form_id):
-#    return render(request, 'record.html', {'form_id': form_id})
-
-def start_record_api(request, form_id):
-    if request.method == 'POST':
-        start_recording(form_id=form_id, filename=f"{form_id}.mp3")
-        form = Form.objects.get(id=form_id)
-        responses = FormResponse.objects.filter(form_id=form)
-    return render(request, 'record.html', {'form': form, 'responses': responses, 'is_recording': is_recording, 'is_paused': paused})
-
-def stop_record_api(request, form_id):
-    if request.method == 'POST':
-        stop_recording()
-        form = Form.objects.get(id=form_id)
-        responses = FormResponse.objects.filter(form_id=form)
-        print(responses)
-    return render(request, 'record.html', {'form': form, 'responses': responses, 'is_recording': is_recording, 'is_paused': paused})
-
-def pause_record_api(request, form_id):
-    if request.method == 'POST':
-        toggle_pause_recording()
-        form = Form.objects.get(id=form_id)
-        responses = FormResponse.objects.filter(form_id=form)
-        print(responses)
-    return render(request, 'record.html', {'form': form, 'responses': responses, 'is_recording': is_recording, 'is_paused': paused})
+    return render(request, 'record.html', {'form': form, 'responses': responses})
 
 def upload_audio(request, form_id):
     if request.method == 'POST':
@@ -210,10 +197,9 @@ def upload_audio(request, form_id):
         audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
         if audio_chunk:
             # Convert audio chunk to MP3
-            audio_dir = 'temp/'
-            os.makedirs(audio_dir, exist_ok=True)  # Create the directory if it doesn't exist
-            audio_path = os.path.join(audio_dir, f'audio{form_id}.webm')  # Specify the path to save the audio file
-            with open(audio_path, 'ab') as f:
+            audio_dir = 'audio_files'
+            audio_path = default_storage.path(f'{audio_dir}/form_{form_id}_audio.webm')  # Specify the path to save the audio file
+            with default_storage.open(audio_path, 'ab') as f:
                 for chunk in audio_chunk.chunks():
                     f.write(chunk)
 
@@ -222,10 +208,22 @@ def upload_audio(request, form_id):
 
 def stop_audio(request, form_id):
     if request.method == 'POST':
+        audio_dir = 'audio_files'
+        audio_path = default_storage.path(f'{audio_dir}/form_{form_id}_audio.webm')  # Specify the path to the audio file
+        audio_file = AudioFile(form_id=form_id, audio_file=audio_path)
+        audio_file.save()
+
+        # go to each formresponse in the model
+        # preload the system prompt
+        # find the question
+        # get output and load into form response.response response.save()
+
+        whisper.convert_audio(audio_file)
+        return JsonResponse({'success': True})
+        #return redirect('response_form', form_id)
         
-        temp_path = default_storage.save(audio_path, ContentFile(audio_chunk.read()))
-        return redirect('response_form', form_id)
     return JsonResponse({'success': False})
+
 
 
 def response_form(request, form_id):

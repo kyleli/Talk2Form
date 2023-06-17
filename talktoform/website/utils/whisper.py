@@ -1,7 +1,7 @@
 import openai
-from config import CONVERSATION_TYPE, LANGUAGE, WHISPER_MODEL_ID
+import os
 
-def convert_audio(api_key, media_file_path, TRANSCRIPT_PATH):
+def convert_audio(audio_file, conversation_type='A Hospital Visit', language='english', WHISPER_MODEL_ID='whisper-1'):
     """
     Converts audio file to text using OpenAI's Whisper ASR API.
 
@@ -12,17 +12,14 @@ def convert_audio(api_key, media_file_path, TRANSCRIPT_PATH):
     Returns:
     - None
     """
-    with open(media_file_path, 'rb') as media_file:
+
+    with open(audio_file.audio_file.path, 'rb') as media_file:
         response = openai.Audio.transcribe(
-            api_key=api_key,
+            api_key=os.environ.get('OPENAI_API_KEY'),
             model=WHISPER_MODEL_ID,
             file=media_file,
-            prompt=f"This is a conversation about {CONVERSATION_TYPE} in {LANGUAGE}.",
+            prompt=f"This is a conversation about {conversation_type} in {language}.",
             response_format='text'
         )
-        with open(TRANSCRIPT_PATH, 'w', encoding='utf-8') as transcript_file:
-            transcript_file.write(response)
-        
-if __name__ == '__main__':
-    api_key = input("API KEY: ")
-    convert_audio(api_key, 'transcript.txt')
+        audio_file.transcript = response
+        audio_file.save()
