@@ -11,7 +11,7 @@ from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile,
 from .utils import whisper
 from django.http import JsonResponse
 from django.core.files.storage import default_storage
-
+import os
 
 # Create your views here.
 def index(request):
@@ -203,6 +203,7 @@ def upload_audio(request, form_id):
             with default_storage.open(audio_path, 'ab') as f:
                 for chunk in audio_chunk.chunks():
                     f.write(chunk)
+                    print(os.getcwd())
 
         return JsonResponse({'success': True})
     return HttpResponse('ok')
@@ -218,8 +219,8 @@ def stop_audio(request, form_id):
         whisper.convert_audio(audio_file)
 
         # Delete the audio file
-        #if default_storage.exists(audio_path):
-            #default_storage.delete(audio_path)
+        if default_storage.exists(audio_path):
+            default_storage.delete(audio_path)
 
         form = Form.objects.get(id=form_id)
         form_responses = form.formresponse_set.all()
