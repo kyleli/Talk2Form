@@ -8,6 +8,10 @@ pip install --upgrade pip
 
 pip install poetry==1.5.0
 
+rm poetry.lock
+
+poetry lock
+
 python -m poetry install
 
 echo "Running 'collectstatic' command..."
