@@ -10,7 +10,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "./build.sh"
-    startCommand: "gunicorn mysite.wsgi:application"
+    startCommand: "gunicorn talktoform.wsgi:application"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
