@@ -14,6 +14,10 @@ echo "Running 'collectstatic' command..."
 
 python manage.py collectstatic --noinput
 
+echo "Making Migrations"
+
 python3 manage.py makemigrations
+
+echo "Migrating"
 
 python3 manage.py migrate
