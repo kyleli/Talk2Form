@@ -15,7 +15,6 @@ urlpatterns = [
     path('editform/<int:form_template_id>/edit_question/<int:question_id>/', views.edit_question, name='edit_question'),
     path('editform/<int:form_template_id>/save_question/<int:question_id>/', views.save_question, name='save_question'),
     path('create_form/<int:template_id>/', views.create_form, name='create_form'),
-    #path('record/<int:form_id>/', views.record_form, name='record'),
     path('upload_audio/<int:form_id>/', views.upload_audio, name='upload_audio'),
     path('stop_audio/<int:form_id>/', views.stop_audio, name='stop_audio'),
     path('response_form/<int:form_id>/', views.response_form, name='response_form')

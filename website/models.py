@@ -2,16 +2,14 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from django.core.files import File
 from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
-class User(AbstractUser):
-    approval = models.BooleanField(default=False)
-    def __str__(self):
-        return f"User ID: {self.id} | User: {self.username}"
+#class User(AbstractUser):
+    #approval = models.BooleanField(default=False)
+    #def __str__(self):
+        #return f"User ID: {self.id} | User: {self.username}"
 
 class FormTemplate(models.Model):
     title = models.CharField(max_length=255)
@@ -21,7 +19,6 @@ class FormTemplate(models.Model):
 
     def __str__(self):
         return f"FormTemplate ID: {self.id} | User: {self.user.username} | Template: {self.title}"
-
 
 class Form(models.Model):
     template = models.ForeignKey(FormTemplate, on_delete=models.CASCADE)
