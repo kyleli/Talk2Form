@@ -61,7 +61,7 @@ class FormResponse(models.Model):
 
 class AudioFile(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE)
-    audio_file = models.FileField(storage=default_storage, upload_to='audio_files/', default=None)
+    audio_file = models.FileField(upload_to='', default=None)
     transcript = models.TextField(default="")
 
     def __str__(self):
