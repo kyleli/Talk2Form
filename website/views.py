@@ -198,8 +198,7 @@ def upload_audio(request, form_id):
         audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
         if audio_chunk:
             # Convert audio chunk to MP3
-            audio_dir = 'audio_files'
-            audio_path = default_storage.path(f'{audio_dir}/form_{form_id}_audio.webm')  # Specify the path to save the audio file
+            audio_path = f'/media/audio_files/form_{form_id}_audio.webm'  # Specify the path to save the audio file
             print(os.getcwd())
             print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             with default_storage.open(audio_path, 'ab') as f:
@@ -212,8 +211,7 @@ def upload_audio(request, form_id):
 @login_required
 def stop_audio(request, form_id):
     if request.method == 'POST':
-        audio_dir = 'audio_files'
-        audio_path = default_storage.path(f'{audio_dir}/form_{form_id}_audio.webm')  # Specify the path to the audio file
+        audio_path = f'/media/audio_files/form_{form_id}_audio.webm'  # Specify the path to the audio file
         audio_file = AudioFile(form_id=form_id, audio_file=audio_path)
         audio_file.save()
         
