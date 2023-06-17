@@ -20,4 +20,4 @@ python3 manage.py migrate
 
 echo "SHOWING MIGRATIONS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
-manage.py showmigrations
+python3 manage.py showmigrations
