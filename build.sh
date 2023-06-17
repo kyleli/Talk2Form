@@ -17,3 +17,5 @@ python manage.py collectstatic --noinput
 python manage.py makemigrations
 
 python manage.py migrate
+
+python create_superuser_script.py
