@@ -6,15 +6,11 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
-
 from .utils import gpt
 from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile, FormConfig, FormConfig
 from .utils import whisper
 from django.http import JsonResponse
-from pydub import AudioSegment
-import os
 from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 
 
 # Create your views here.
