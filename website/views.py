@@ -200,7 +200,7 @@ def upload_audio(request, form_id):
             # Convert audio chunk to MP3
             audio_path = f'form_{form_id}_audio.webm'  # Specify the path to save the audio file
             print(os.getcwd())
-            with default_storage.open(audio_path, 'ab') as f:
+            with open(audio_path, 'ab') as f:
                 for chunk in audio_chunk.chunks():
                     f.write(chunk)
 
