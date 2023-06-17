@@ -1,4 +1,5 @@
 {% load static %}
+{% csrf_token %}
 
 <!DOCTYPE html>
 <html>
@@ -18,18 +19,93 @@
     {% endfor %}
     <p>Recording: {{ is_recording }} Paused: {{ is_paused }}</p>
     <div class="bottom-icons">
-        <form method="POST" class="center-button-form" action="{% url 'start_record_api' form.id %}">
-            {% csrf_token %}
-            <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-microphone"></i></a>
-        </form>
-        <form method="POST" class="center-button-form" action="{% url 'stop_record_api' form.id %}">
-            {% csrf_token %}
-            <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-floppy-disk"></i></a>
-        </form>
-        <form method="POST" class="center-button-form" action="{% url 'pause_record_api' form.id %}">
-            {% csrf_token %}
-            <a href="" onclick="event.preventDefault(); this.closest('form').submit();" class="icon new-object-icon"><i class="ph-fill ph-plus"></i></a>
-        </form>
+        <button id="start-btn">Start Recording</button>
+        <button id="stop-btn">Stop Recording</button>
+        <button id="pause-btn">Pause Recording</button>
+        <button id="resume-btn">Resume Recording</button>
     </div>
+    <script>
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+        const formId = '{{ form.id }}';
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resumeBtn = document.getElementById('resume-btn');
+
+        let mediaRecorder; // MediaRecorder object
+
+        startBtn.addEventListener('click', startRecording);
+        stopBtn.addEventListener('click', stopRecording);
+        pauseBtn.addEventListener('click', pauseRecording);
+        resumeBtn.addEventListener('click', resumeRecording);
+
+        function startRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(function(stream) {
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.addEventListener('dataavailable', function(e) {
+                if (e.data.size > 0) {
+                sendAudioChunk(e.data); // Send the chunk to the server
+                }
+            });
+            mediaRecorder.start(1000);
+            })
+            .catch(function(err) {
+            console.error('Error accessing microphone:', err);
+            });
+        }
+
+        function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(function(track) {
+            track.stop();
+            });
+            }
+            fetch(`/stop_audio/${formId}/`, {
+            method: 'POST',
+            })
+            .then(function(response) {
+                // Handle server response
+            })
+            .catch(function(error) {
+                console.error('Error stopping audio:', error);
+            });
+        }
+
+        function pauseRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'paused') {
+            mediaRecorder.pause();
+            }
+        }
+
+        function resumeRecording() {
+            if (mediaRecorder && mediaRecorder.state == 'paused') {
+            mediaRecorder.resume();
+            }
+        }
+
+        function sendAudioChunk(chunk) {
+        const formData = new FormData();
+        formData.append('audioChunk', chunk);
+        formData.append('form_id', formId);
+        formData.append('csrfmiddlewaretoken', csrfToken);
+        
+
+        fetch(`/upload_audio/${formId}/`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(response) {
+            // Handle server response
+            // If needed, you can delete the chunk here
+            chunk = null;
+        })
+        .catch(function(error) {
+            console.error('Error sending audio chunk:', error);
+        });
+        }
+    </script>
 </body>
 </html>

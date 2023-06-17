@@ -7,8 +7,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile
-from .utils.record import stop_recording, start_recording, is_recording, toggle_pause_recording, paused
+from .utils.record2 import stop_recording, start_recording, is_recording, toggle_pause_recording, paused
 from django.http import JsonResponse
+from pydub import AudioSegment
+import os
+
 
 # Create your views here.
 def index(request):
@@ -199,6 +202,31 @@ def pause_record_api(request, form_id):
         responses = FormResponse.objects.filter(form_id=form)
         print(responses)
     return render(request, 'record.html', {'form': form, 'responses': responses, 'is_recording': is_recording, 'is_paused': paused})
+
+def upload_audio(request, form_id):
+    if request.method == 'POST':
+        form_data = request.POST
+        form_id = form_data.get('form_id')
+        audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
+        if audio_chunk:
+            # Convert audio chunk to MP3
+            audio_dir = 'temp/'
+            os.makedirs(audio_dir, exist_ok=True)  # Create the directory if it doesn't exist
+            audio_path = os.path.join(audio_dir, f'audio{form_id}.webm')  # Specify the path to save the audio file
+            with open(audio_path, 'ab') as f:
+                for chunk in audio_chunk.chunks():
+                    f.write(chunk)
+
+        return JsonResponse({'success': True})
+    return HttpResponse('ok')
+
+def stop_audio(request, form_id):
+    if request.method == 'POST':
+        
+        temp_path = default_storage.save(audio_path, ContentFile(audio_chunk.read()))
+        return redirect('response_form', form_id)
+    return JsonResponse({'success': False})
+
 
 def response_form(request, form_id):
     form = get_object_or_404(Form, id=form_id)
