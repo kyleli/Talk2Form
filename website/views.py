@@ -200,7 +200,6 @@ def upload_audio(request, form_id):
             # Convert audio chunk to MP3
             audio_path = f'/media/audio_files/form_{form_id}_audio.webm'  # Specify the path to save the audio file
             print(os.getcwd())
-            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             with default_storage.open(audio_path, 'ab') as f:
                 for chunk in audio_chunk.chunks():
                     f.write(chunk)
@@ -218,8 +217,10 @@ def stop_audio(request, form_id):
         whisper.convert_audio(audio_file)
 
         # Delete the audio file
-        if default_storage.exists(audio_path):
-            default_storage.delete(audio_path)
+        print("Does it exist?" + os.path.exists(audio_path))
+        if os.path.exists(audio_path):
+            print("Deleted")
+            os.path.exists(audio_path)
 
         form = Form.objects.get(id=form_id)
         form_responses = form.formresponse_set.all()
