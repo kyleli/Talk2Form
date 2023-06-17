@@ -218,8 +218,8 @@ def stop_audio(request, form_id):
         whisper.convert_audio(audio_file)
 
         # Delete the audio file
-        if default_storage.exists(audio_path):
-            default_storage.delete(audio_path)
+        #if default_storage.exists(audio_path):
+            #default_storage.delete(audio_path)
 
         form = Form.objects.get(id=form_id)
         form_responses = form.formresponse_set.all()
