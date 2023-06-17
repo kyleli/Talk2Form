@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, FormTemplate, Form, Question, FormResponse, AudioFile, FormConfig
+from .models import FormTemplate, Form, Question, FormResponse, AudioFile, FormConfig
 
 # Register your models here.
 admin.site.register(FormTemplate)
