@@ -26,6 +26,7 @@ class Form(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     form_template_id = models.PositiveIntegerField(default=0)
+    transcript = models.TextField(default="")
 
     def save(self, *args, **kwargs):
         if self.pk is None:  # New form instance

@@ -211,10 +211,12 @@ def upload_audio(request, form_id):
 def stop_audio(request, form_id):
     if request.method == 'POST':
         audio_path = f'form_{form_id}_audio.webm'  # Specify the path to the audio file
-        audio_file = AudioFile(form_id=form_id, audio_file=audio_path)
-        audio_file.save()
+        #audio_file = AudioFile(form_id=form_id, audio_file=audio_path)
+        #audio_file.save()
         
-        whisper.convert_audio(audio_file)
+        form = Form.objects.get(id=form_id)
+
+        whisper.convert_audio(audio_path, form)
 
         # Delete the audio file
         print("Does it exist?" + os.path.exists(audio_path))
@@ -222,7 +224,6 @@ def stop_audio(request, form_id):
             print("Deleted")
             os.path.exists(audio_path)
 
-        form = Form.objects.get(id=form_id)
         form_responses = form.formresponse_set.all()
         for form_response in form_responses:
             gpt.process_form_query(form_response, audio_file)
