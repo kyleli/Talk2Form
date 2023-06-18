@@ -1,7 +1,7 @@
 import openai
 import os
 
-def convert_audio(audio_path, form):
+def convert_audio(audio_file):
     """
     Converts audio file to text using OpenAI's Whisper ASR API.
 
@@ -14,7 +14,8 @@ def convert_audio(audio_path, form):
     """
 
     #Get FormConfig settings
-    form_template_instance = form.template
+    form_instance = audio_file.form
+    form_template_instance = form_instance.template
     form_config_instance = form_template_instance.formconfig
 
     #language
@@ -24,7 +25,7 @@ def convert_audio(audio_path, form):
     #audio_recognition_model
     audio_recognition_model_id = form_config_instance.audio_recognition_model_id
 
-    with open(audio_path, 'rb') as media_file:
+    with open(audio_file.audio_file.path, 'rb') as media_file:
         response = openai.Audio.transcribe(
             api_key=os.environ.get('OPENAI_API_KEY'),
             model=audio_recognition_model_id,
@@ -32,5 +33,5 @@ def convert_audio(audio_path, form):
             prompt=f"This is a conversation about {conversation_type} in {language}.",
             response_format='text'
         )
-        form.transcript = response
-        form.save()
+        audio_file.transcript = response
+        audio_file.save()

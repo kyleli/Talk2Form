@@ -1,6 +1,5 @@
 import openai
 import os
-from website.models import FormConfig, Form, Question, FormResponse, AudioFile
 
 def new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversation_log):
     """

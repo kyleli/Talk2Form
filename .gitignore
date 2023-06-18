@@ -1,3 +1,4 @@
-output.mp3
-transcript.txt
+media/
 **/__pycache__/
+myprojectenv/
+db.sqlite3

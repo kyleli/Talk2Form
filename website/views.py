@@ -11,7 +11,7 @@ from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile,
 from .utils import whisper
 from django.http import JsonResponse
 from django.core.files.storage import default_storage
-import os
+
 
 # Create your views here.
 def index(request):
@@ -198,9 +198,9 @@ def upload_audio(request, form_id):
         audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
         if audio_chunk:
             # Convert audio chunk to MP3
-            audio_path = f'form_{form_id}_audio.webm'  # Specify the path to save the audio file
-            print(os.getcwd())
-            with open(audio_path, 'ab') as f:
+            audio_dir = 'audio_files'
+            audio_path = default_storage.path(f'{audio_dir}/form_{form_id}_audio.webm')  # Specify the path to save the audio file
+            with default_storage.open(audio_path, 'ab') as f:
                 for chunk in audio_chunk.chunks():
                     f.write(chunk)
 
@@ -210,20 +210,18 @@ def upload_audio(request, form_id):
 @login_required
 def stop_audio(request, form_id):
     if request.method == 'POST':
-        audio_path = f'form_{form_id}_audio.webm'  # Specify the path to the audio file
-        #audio_file = AudioFile(form_id=form_id, audio_file=audio_path)
-        #audio_file.save()
+        audio_dir = 'audio_files'
+        audio_path = default_storage.path(f'{audio_dir}/form_{form_id}_audio.webm')  # Specify the path to the audio file
+        audio_file = AudioFile(form_id=form_id, audio_file=audio_path)
+        audio_file.save()
         
-        form = Form.objects.get(id=form_id)
-
-        whisper.convert_audio(audio_path, form)
+        whisper.convert_audio(audio_file)
 
         # Delete the audio file
-        print("Does it exist?" + os.path.exists(audio_path))
-        if os.path.exists(audio_path):
-            print("Deleted")
-            os.path.exists(audio_path)
+        if default_storage.exists(audio_path):
+            default_storage.delete(audio_path)
 
+        form = Form.objects.get(id=form_id)
         form_responses = form.formresponse_set.all()
         for form_response in form_responses:
             gpt.process_form_query(form_response, audio_file)
