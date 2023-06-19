@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from .utils import gpt
-from .models import FormTemplate, User, Question, Form, FormResponse, AudioFile, FormConfig, FormConfig
+from .models import FormTemplate, User, Question, Form, FormResponse, FormConfig, FormConfig
 from .utils import whisper
 from django.http import JsonResponse
 from django.core.files.storage import default_storage
@@ -193,38 +193,31 @@ def create_form(request, template_id):
 @login_required
 def upload_audio(request, form_id):
     if request.method == 'POST':
-        form_data = request.POST
-        form_id = form_data.get('form_id')
+        form_instance = get_object_or_404(Form, id=form_id)
         audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
         if audio_chunk:
-            # Convert audio chunk to MP3
-            audio_dir = 'audio_files'
-            audio_path = default_storage.path(f'{audio_dir}/form_{form_id}_audio.webm')  # Specify the path to save the audio file
-            with default_storage.open(audio_path, 'ab') as f:
-                for chunk in audio_chunk.chunks():
-                    f.write(chunk)
-
+            audio_bytes = audio_chunk.read()
+            transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
+            form_instance.transcript = transcribed_text
+            form_instance.save()
         return JsonResponse({'success': True})
     return HttpResponse('ok')
 
 @login_required
 def stop_audio(request, form_id):
     if request.method == 'POST':
-        audio_dir = 'audio_files'
-        audio_path = default_storage.path(f'{audio_dir}/form_{form_id}_audio.webm')  # Specify the path to the audio file
-        audio_file = AudioFile(form_id=form_id, audio_file=audio_path)
-        audio_file.save()
-        
-        whisper.convert_audio(audio_file)
-
-        # Delete the audio file
-        if default_storage.exists(audio_path):
-            default_storage.delete(audio_path)
-
-        form = Form.objects.get(id=form_id)
-        form_responses = form.formresponse_set.all()
+        form_instance = get_object_or_404(Form, id=form_id)
+        audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
+        if audio_chunk:
+            audio_bytes = audio_chunk.read()
+            transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
+            form_instance.transcript = transcribed_text
+            form_instance.save()
+        form_responses = form_instance.formresponse_set.all()
         for form_response in form_responses:
-            gpt.process_form_query(form_response, audio_file)
+            form_instance = form_response.form
+            TRANSCRIPT = form_instance.transcript
+            gpt.process_form_query(form_response)
         
         return JsonResponse({'success': True})
         

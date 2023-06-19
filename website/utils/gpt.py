@@ -29,11 +29,12 @@ def new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversation_log):
     
     return conversation_log
 
-def process_form_query(form_response, audio_file):
+def process_form_query(form_response):
     openai.api_key = os.environ.get('OPENAI_API_KEY')
 
     # Get Transcript
-    TRANSCRIPT = audio_file.transcript
+    form_instance = form_response.form
+    TRANSCRIPT = form_instance.transcript
 
     # Get FormConfig
     form_template = form_response.form.template

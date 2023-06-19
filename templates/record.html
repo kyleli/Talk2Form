@@ -42,13 +42,13 @@
         function startRecording() {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(function(stream) {
-            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder = new MediaRecorder(stream, {mimeType: 'audio/webm; codecs="opus"'});
             mediaRecorder.addEventListener('dataavailable', function(e) {
                 if (e.data.size > 0) {
                 sendAudioChunk(e.data); // Send the chunk to the server
                 }
             });
-            mediaRecorder.start(1000);
+            mediaRecorder.start();
             })
             .catch(function(err) {
             console.error('Error accessing microphone:', err);
@@ -62,19 +62,6 @@
             track.stop();
             });
             }
-            const formData = new FormData();
-            formData.append('csrfmiddlewaretoken', csrfToken);
-            fetch(`/stop_audio/${formId}/`, {
-            method: 'POST',
-            body: formData
-            })
-            .then(function(response) {
-                response.json().then(function(json){console.log(json)});
-                window.location.href = `/response_form/${formId}/`;
-            })
-            .catch(function(error) {
-                console.error('Error stopping audio:', error);
-            });
         }
 
         function pauseRecording() {
@@ -96,13 +83,13 @@
         formData.append('csrfmiddlewaretoken', csrfToken);
         
 
-        fetch(`/upload_audio/${formId}/`, {
+        fetch(`/stop_audio/${formId}/`, {
             method: 'POST',
             body: formData
         })
         .then(function(response) {
-            // Handle server response
-            // If needed, you can delete the chunk here
+            response.json().then(function(json){console.log(json)});
+            window.location.href = `/response_form/${formId}/`;
             chunk = null;
         })
         .catch(function(error) {

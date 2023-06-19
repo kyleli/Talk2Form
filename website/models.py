@@ -26,6 +26,7 @@ class Form(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     form_template_id = models.PositiveIntegerField(default=0)
+    transcript = models.TextField(default="")
 
     def save(self, *args, **kwargs):
         if self.pk is None:  # New form instance
@@ -57,21 +58,6 @@ class FormResponse(models.Model):
     
     def __str__(self):
         return f"FormResponse ID: {self.id} | User: {self.question.template.user.username} | Form: {self.question.template.title} #{self.form.form_template_id} | Question: {self.question.question} | Response: {self.truncated_response()}"
-
-
-class AudioFile(models.Model):
-    form = models.ForeignKey(Form, on_delete=models.CASCADE)
-    audio_file = models.FileField(storage=default_storage, upload_to='audio_files/', default=None)
-    transcript = models.TextField(default="")
-
-    def __str__(self):
-        return f"AudioFile ID: {self.id} | User: {self.form.template.user.username} | Form: {self.form.template.title} #{self.form.form_template_id} | Audio: {self.audio_file}"
-    
-# If you run into Windows Fatal Exception: Access Violations when running 'python manage.py test', this is the reason it's trying to delete stuff the test doesn't have access to
-@receiver(post_delete, sender=AudioFile)
-def delete_audio_file(sender, instance, **kwargs):
-    # Delete the file from the storage
-    instance.audio_file.delete(save=False)
 
 class FormConfig(models.Model):
     AUDIO_RECOGNITION_MODEL_CHOICES = [

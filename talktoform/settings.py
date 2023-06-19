@@ -26,8 +26,9 @@ SECRET_KEY = 'django-insecure-x@9fj=jcg8k+a(4=*fdncww6$s$8$-$h)llw6%+s_17qlt7g13
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['talk2form.com', 'talktoform.com', 'localhost', '127.0.0.1', 'edbc-99-67-244-35.ngrok-free.app']
 
+CSRF_TRUSTED_ORIGINS = ['https://edbc-99-67-244-35.ngrok-free.app']
 
 # Application definition
 
@@ -118,6 +119,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]

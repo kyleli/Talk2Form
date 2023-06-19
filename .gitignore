@@ -2,3 +2,4 @@ media/
 **/__pycache__/
 myprojectenv/
 db.sqlite3
+website/migrations/
