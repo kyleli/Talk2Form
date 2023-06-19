@@ -30,7 +30,7 @@ def convert_audio(audio_bytes, form_instance):
     #audio_recognition_model
     audio_recognition_model_id = form_config_instance.audio_recognition_model_id
 
-    with BytesIOWithFilename(audio_bytes, name='audio_file.webm') as media_file:
+    with BytesIOWithFilename(audio_bytes, name=f'audio_file.mp4') as media_file:
         response = openai.Audio.transcribe(
             api_key=os.environ.get('OPENAI_API_KEY'),
             model=audio_recognition_model_id,
@@ -38,4 +38,5 @@ def convert_audio(audio_bytes, form_instance):
             prompt=f"This is a conversation about {conversation_type} in {language}.",
             response_format='text'
         )
+        print(response)
         return response

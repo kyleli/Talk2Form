@@ -6,9 +6,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
-from .utils import gpt
+from .utils import gpt, whisper, audioconvert
 from .models import FormTemplate, User, Question, Form, FormResponse, FormConfig, FormConfig
-from .utils import whisper
 from django.http import JsonResponse
 from django.core.files.storage import default_storage
 
@@ -208,15 +207,21 @@ def stop_audio(request, form_id):
     if request.method == 'POST':
         form_instance = get_object_or_404(Form, id=form_id)
         audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
+        print(request.POST.get('dataType'))
         if audio_chunk:
+            #with open("recording.mp4", 'ab') as lol:
+                #for chunk in audio_chunk:
+                    #lol.write(chunk)
             audio_bytes = audio_chunk.read()
-            transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
+            if request.POST.get('dataType') == 'mp4':
+                converted_audio_bytes = audioconvert.mp4_to_webm(audio_bytes)
+                transcribed_text = whisper.convert_audio(converted_audio_bytes, form_instance)
+            else:
+                transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
             form_instance.transcript = transcribed_text
             form_instance.save()
         form_responses = form_instance.formresponse_set.all()
         for form_response in form_responses:
-            form_instance = form_response.form
-            TRANSCRIPT = form_instance.transcript
             gpt.process_form_query(form_response)
         
         return JsonResponse({'success': True})

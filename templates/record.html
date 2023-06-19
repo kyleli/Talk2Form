@@ -40,61 +40,67 @@
         resumeBtn.addEventListener('click', resumeRecording);
 
         function startRecording() {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(function(stream) {
-            mediaRecorder = new MediaRecorder(stream, {mimeType: 'audio/webm; codecs="opus"'});
-            mediaRecorder.addEventListener('dataavailable', function(e) {
-                if (e.data.size > 0) {
-                sendAudioChunk(e.data); // Send the chunk to the server
-                }
-            });
-            mediaRecorder.start();
-            })
-            .catch(function(err) {
-            console.error('Error accessing microphone:', err);
-            });
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    let mimeType = 'audio/webm;codec=opus';
+                    let dataType = 'webm';
+                    if (!MediaRecorder.isTypeSupported(mimeType)) {
+                        mimeType = 'audio/mp4;codec=aac';
+                        dataType = 'mp4';
+                    }
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
+                    mediaRecorder.addEventListener('dataavailable', function(e) {
+                        if (e.data.size > 0) {
+                            sendAudioChunk(e.data, dataType); // Send the chunk to the server
+                        }
+                    });
+                    mediaRecorder.start();
+                })
+                .catch(function(err) {
+                    console.error('Error accessing microphone:', err);
+                });
         }
 
         function stopRecording() {
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-            mediaRecorder.stop();
-            mediaRecorder.stream.getTracks().forEach(function(track) {
-            track.stop();
-            });
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(function(track) {
+                    track.stop();
+                });
             }
         }
 
         function pauseRecording() {
             if (mediaRecorder && mediaRecorder.state !== 'paused') {
-            mediaRecorder.pause();
+                mediaRecorder.pause();
             }
         }
 
         function resumeRecording() {
-            if (mediaRecorder && mediaRecorder.state == 'paused') {
-            mediaRecorder.resume();
+            if (mediaRecorder && mediaRecorder.state === 'paused') {
+                mediaRecorder.resume();
             }
         }
 
-        function sendAudioChunk(chunk) {
-        const formData = new FormData();
-        formData.append('audioChunk', chunk);
-        formData.append('form_id', formId);
-        formData.append('csrfmiddlewaretoken', csrfToken);
-        
+        function sendAudioChunk(chunk, dataType) {
+            const formData = new FormData();
+            formData.append('audioChunk', chunk);
+            formData.append('form_id', formId);
+            formData.append('dataType', dataType);
+            formData.append('csrfmiddlewaretoken', csrfToken);
 
-        fetch(`/stop_audio/${formId}/`, {
-            method: 'POST',
-            body: formData
-        })
-        .then(function(response) {
-            response.json().then(function(json){console.log(json)});
-            window.location.href = `/response_form/${formId}/`;
-            chunk = null;
-        })
-        .catch(function(error) {
-            console.error('Error sending audio chunk:', error);
-        });
+            fetch(`/stop_audio/${formId}/`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) {
+                response.json().then(function(json){console.log(json)});
+                window.location.href = `/response_form/${formId}/`;
+                chunk = null;
+            })
+            .catch(function(error) {
+                console.error('Error sending audio chunk:', error);
+            });
         }
     </script>
 </body>

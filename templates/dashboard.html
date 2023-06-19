@@ -14,7 +14,7 @@
     </div>
     <div class="dashboard-container">
         {% for form_template in form_templates %}
-        <a class="form-link" href="{% url 'editform' form_template.id %}"><span>{{ form_template.title }}</span><i class="ph ph-sign-in"></i></a>
+        <a class="form-link" href="{% url 'editform' form_template.id %}"><span>{{ form_template.title }}</span><i class="ph ph-arrow-circle-right"></i></a>
         {% endfor %}
     </div>
     <footer>
