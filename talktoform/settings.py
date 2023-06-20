@@ -34,7 +34,11 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
-ALLOWED_HOSTS = ["talk2form-eidow.ondigitalocean.app", "talk2form.com", '127.0.0.1', 'localhost']
+if DEVELOPMENT_MODE:
+    ALLOWED_COSTS = ['127.0.0.1', 'localhost']
+else:
+    ALLOWED_HOSTS = ["talk2form-eidow.ondigitalocean.app", "talk2form.com"]
+
 
 # Application definition
 
