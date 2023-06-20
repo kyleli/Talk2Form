@@ -3,3 +3,4 @@ media/
 myprojectenv/
 db.sqlite3
 website/migrations/
+*.pyc
