@@ -31,7 +31,7 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
-ALLOWED_HOSTS = ["https://talk2form-eidow.ondigitalocean.app", "https://talk2form.com"]
+ALLOWED_HOSTS = ["https://talk2form-eidow.ondigitalocean.app", "https://talk2form.com", "talk2form.com"]
 
 # Application definition
 
