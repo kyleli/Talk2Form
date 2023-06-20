@@ -209,9 +209,6 @@ def stop_audio(request, form_id):
         audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
         print(request.POST.get('dataType'))
         if audio_chunk:
-            #with open("recording.mp4", 'ab') as lol:
-                #for chunk in audio_chunk:
-                    #lol.write(chunk)
             audio_bytes = audio_chunk.read()
             if request.POST.get('dataType') == 'mp4':
                 converted_audio_bytes = audioconvert.mp4_to_webm(audio_bytes)
