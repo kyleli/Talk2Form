@@ -15,6 +15,9 @@ from pathlib import Path
 import os
 import sys
 import dj_database_url
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +34,7 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
-ALLOWED_HOSTS = ["https://talk2form-eidow.ondigitalocean.app", "https://talk2form.com", "talk2form.com"]
+ALLOWED_HOSTS = ["talk2form-eidow.ondigitalocean.app", "talk2form.com", '127.0.0.1', 'localhost']
 
 # Application definition
 

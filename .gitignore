@@ -4,3 +4,4 @@ myprojectenv/
 db.sqlite3
 website/migrations/
 *.pyc
+.env
