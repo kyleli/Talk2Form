@@ -10,6 +10,32 @@
 </head>
 <body>
     <div class="form-container">
+        {% for message in messages %}
+        {% if message.tags %} {# check if message has tags #}
+            {% if message.tags == 'success' %}
+                <div class="message success-message">
+                    <span>{{ message }}</span>
+                    <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'error' %}
+                <div class="message error-message">
+                    <span>{{ message }}</span>
+                    <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="message error-message">
+                <span>{{ message }}</span>
+                <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        {% endif %}
+        {% endfor %}
         <div class="question-form-header">
                 <span>{{ form.template.title }}</span>
         </div>

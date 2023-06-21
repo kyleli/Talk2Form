@@ -10,7 +10,9 @@ from .utils import gpt, whisper, audioconvert
 from .models import FormTemplate, User, Question, Form, FormResponse, FormConfig, FormConfig
 from django.http import JsonResponse
 from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import update_session_auth_hash, login
+from django.utils import timezone
+from datetime import datetime, timedelta
 
 # Create your views here.
 def index(request):
@@ -66,8 +68,12 @@ def signup(request):
         last_name = name_parts[1] if len(name_parts) > 1 else ''
 
         user = User.objects.create_user(username=email, email=email, password=password, first_name=first_name, last_name=last_name)
-        messages.success(request, 'Registration successful. Please log in.')
-        return redirect('index')
+
+        # Automatically sign in the user
+        login(request, user)
+
+        messages.success(request, 'Account Created. Create a new form template by clicking + at the bottom of the page.')
+        return redirect('dashboard')
 
     return render(request, 'signup.html')
 
@@ -137,7 +143,7 @@ def create_default_form_template(request):
             title = 'Untitled Form'
             body = 'Form description'
             form_template = FormTemplate.objects.create(title=title, body=body, user=user)
-            
+
             # Create a Settings instance and attach it to the form_template
             FormConfig.objects.create(
                 form_template=form_template,
@@ -150,7 +156,9 @@ def create_default_form_template(request):
                 - You will only answer the question and not write anything else. If you need more information or cannot give a factual answer, write "N/A".''',
             )
 
-            return redirect('dashboard')
+            # Redirect the user to the newly created form template
+            messages.success(request, 'Form Template Created. Create a new question by clicking + at the bottom of the page.')
+            return redirect('editform', form_template_id=form_template.id)
         else:
             messages.error(request, "Non-whitelisted accounts have a maximum of 3 form templates. Delete a form template or request whitelisted access to create a new form.")
             return redirect('dashboard')
@@ -268,10 +276,31 @@ def delete_question(request, form_template_id, question_id):
 @login_required
 def create_form(request, template_id):
     template = get_object_or_404(FormTemplate, pk=template_id)
-    user = request.user  # Assuming the user is authenticated
+    user = request.user
 
-    # Create a new Form linked to the template and the user
-    form = Form.objects.create(template=template, user=user)
+    # Check if the user has unlimited forms due to approval
+    if user.approval:
+        # Create a new Form linked to the template and the user
+        form = Form.objects.create(template=template, user=user)
+    else:
+        # Check if the user has reached the maximum number of forms per day
+        today = timezone.now().date()
+        form_count = Form.objects.filter(user=user, created_at__date=today).count()
+        if form_count >= 3:
+            reset_time = datetime.combine(today + timedelta(days=1), datetime.min.time())  # Reset time is set to midnight of the next day
+            time_left = reset_time - datetime.now()
+
+            # Format the time left to display only hours, minutes, and seconds
+            hours = int(time_left.total_seconds() // 3600)
+            minutes = int((time_left.total_seconds() % 3600) // 60)
+            seconds = int(time_left.total_seconds() % 60)
+            time_left_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+            messages.error(request, f"You have reached the maximum number of form responses allowed for today. Time left: {time_left_str}")
+            return redirect('dashboard')
+
+        # Create a new Form linked to the template and the user
+        form = Form.objects.create(template=template, user=user)
 
     # Retrieve all the questions associated with the template
     questions = Question.objects.filter(template=template)
@@ -279,11 +308,13 @@ def create_form(request, template_id):
     # Create a FormResponse for each question
     for question in questions:
         FormResponse.objects.create(form=form, question=question)
-    
+
     responses = FormResponse.objects.filter(form=form)
     # Redirect to the newly created form's page or render a success message
     # redirect to record form
     return render(request, 'record.html', {'form': form, 'responses': responses})
+
+
 
 @login_required
 def upload_audio(request, form_id):
@@ -303,6 +334,7 @@ def stop_audio(request, form_id):
     if request.method == 'POST':
         form_instance = get_object_or_404(Form, id=form_id)
         audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
+        print(request.POST.get('dataType'))
         if audio_chunk:
             audio_bytes = audio_chunk.read()
             if request.POST.get('dataType') == 'mp4':

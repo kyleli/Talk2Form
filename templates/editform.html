@@ -28,6 +28,16 @@
             closeModal();
             }
         });
+
+        function confirmDeleteFormTemplate() {
+            var deleteBtn = document.getElementById('deleteFormTemplateBtn');
+            var warningText = document.getElementById('deleteFormTemplateWarning');
+            var confirmBtn = document.getElementById('confirmDeleteFormTemplateBtn');
+
+            deleteBtn.style.display = 'none';
+            warningText.style.display = 'block';
+            confirmBtn.style.display = 'block';
+        }
 </script>
     </script>
 </head>
@@ -158,9 +168,11 @@
                     <button class="settings-button cancel" onclick="closeModal()">Cancel</button>
                 </div>
             </form>
-            <form action="{% url 'delete_form_template' form_template.id %}" method="POST">
+            <form id="deleteFormTemplateForm" action="{% url 'delete_form_template' form_template.id %}" method="POST">
                 {% csrf_token %}
-                <button class="settings-button danger" type="submit">Delete Form Template</button>
+                <button id="deleteFormTemplateBtn" class="settings-button danger" type="button" onclick="confirmDeleteFormTemplate()">Delete Form Template</button>
+                <p id="deleteFormTemplateWarning" style="display: none;"><b>Are you sure?</b> <br> <span style="color:rgb(209, 71, 71);">Deleting a form template will delete all associated form responses.</span></p>
+                <button id="confirmDeleteFormTemplateBtn" class="settings-button danger" type="submit" style="display: none;">Confirm Deletion</button>
             </form>
         </div>
     </div>
