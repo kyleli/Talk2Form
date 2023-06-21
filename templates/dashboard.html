@@ -7,12 +7,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <script>
+        function dismissMessage(element) {
+            element.parentNode.removeChild(element);
+        }
+    </script>
 </head>
 <body>
     <div class="header">
         <h1>Dashboard</h1>
     </div>
     <div class="dashboard-container">
+        {% for message in messages %}
+        {% if message.tags %} {# check if message has tags #}
+            {% if message.tags == 'success' %}
+                <div class="message success-message">
+                    <span>{{ message }}</span>
+                    <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'error' %}
+                <div class="message error-message">
+                    <span>{{ message }}</span>
+                    <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="message error-message">
+                <span>{{ message }}</span>
+                <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        {% endif %}
+        {% endfor %}
         {% for form_template in form_templates %}
         <a class="form-link" href="{% url 'editform' form_template.id %}"><span>{{ form_template.title }}</span><i class="ph ph-arrow-circle-right"></i></a>
         {% endfor %}

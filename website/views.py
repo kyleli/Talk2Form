@@ -129,24 +129,31 @@ def dashboard(request):
 @login_required
 def create_default_form_template(request):
     if request.method == 'POST':
-        title = 'Untitled Form'
-        body = 'Form description'
         user = request.user
-        form_template = FormTemplate.objects.create(title=title, body=body, user=user)\
-        
-        # Create a Settings instance and attach it to the form_template, this is tailored towards medical but perhaps the user can select the default template type when they create in the future
-        FormConfig.objects.create(
-            form_template=form_template,
-            conversation_type='A Medical Visit Between a Patient and Doctor',
-            system_prompt='''You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form query.
-            - The dialogue you are provided will consist of a conversation between a doctor and a patient.
-            - You will take this information provided and fill out the following form and write "N/A" if you do not have information to factually fill out the questions or interpret responses.
-            - You may interpret answers to the questions only using factual information stated in the transcript, do not fabricate any information.
-            - You will answer each question factually, as if you were filling out a form, and refrain from adding any additional commentary.
-            - You will only answer the question and not write anything else. If you need more information or can not give a factual answer, write "N/A".''',
-        )
 
-        return redirect('dashboard')
+        # Check if the user has approval and fewer than 3 form templates
+        if user.approval or FormTemplate.objects.filter(user=user).count() < 3:
+            title = 'Untitled Form'
+            body = 'Form description'
+            form_template = FormTemplate.objects.create(title=title, body=body, user=user)
+            
+            # Create a Settings instance and attach it to the form_template
+            FormConfig.objects.create(
+                form_template=form_template,
+                conversation_type='A Medical Visit Between a Patient and Doctor',
+                system_prompt='''You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form query.
+                - The dialogue you are provided will consist of a conversation between a doctor and a patient.
+                - You will take this information provided and fill out the following form and write "N/A" if you do not have information to factually fill out the questions or interpret responses.
+                - You may interpret answers to the questions only using factual information stated in the transcript, do not fabricate any information.
+                - You will answer each question factually, as if you were filling out a form, and refrain from adding any additional commentary.
+                - You will only answer the question and not write anything else. If you need more information or cannot give a factual answer, write "N/A".''',
+            )
+
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Non-whitelisted accounts have a maximum of 3 form templates. Delete a form template or request whitelisted access to create a new form.")
+            return redirect('dashboard')
+
     return render(request, 'dashboard.html')
 
 @login_required
@@ -173,10 +180,18 @@ def save_template_title(request, form_template_id):
 @login_required
 def create_question(request, form_template_id):
     if request.method == 'POST':
-        title = 'New Question'
+        user = request.user
         template = get_object_or_404(FormTemplate, id=form_template_id)
-        Question.objects.create(template=template, question=title)
-        return redirect('editform', form_template_id=form_template_id)
+
+        # Check if the user has approval and fewer than 3 questions in the form template
+        if user.approval or Question.objects.filter(template=template).count() < 3:
+            title = 'New Question'
+            Question.objects.create(template=template, question=title)
+            return redirect('editform', form_template_id=form_template_id)
+        else:
+            messages.error(request, "Non-whitelisted accounts have a maximum of 3 questions per form template.")
+            return redirect('editform', form_template_id=form_template_id)
+
     return redirect('editform', form_template_id=form_template_id)
 
 @login_required

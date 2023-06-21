@@ -7,9 +7,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <script>
+        function dismissMessage(element) {
+            element.parentNode.removeChild(element);
+        }
+    </script>
 </head>
 <body>
     <div class="form-container">
+        {% for message in messages %}
+        {% if message.tags %} {# check if message has tags #}
+            {% if message.tags == 'success' %}
+                <div class="message success-message">
+                    <span>{{ message }}</span>
+                    <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'error' %}
+                <div class="message error-message">
+                    <span>{{ message }}</span>
+                    <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="message error-message">
+                <span>{{ message }}</span>
+                <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        {% endif %}
+        {% endfor %}
         <div class="question-form-header">
             {% if editing %}
                 <form method="POST" action="{% url 'save_template_title' form_template.id %}">
