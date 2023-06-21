@@ -337,20 +337,30 @@ def stop_audio(request, form_id):
         print(request.POST.get('dataType'))
         if audio_chunk:
             audio_bytes = audio_chunk.read()
-            if request.POST.get('dataType') == 'mp4':
-                converted_audio_bytes = audioconvert.mp4_to_webm(audio_bytes)
-                transcribed_text = whisper.convert_audio(converted_audio_bytes, form_instance)
-            else:
-                transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
-            form_instance.transcript = transcribed_text
-            form_instance.save()
+            try:
+                if request.POST.get('dataType') == 'mp4':
+                    converted_audio_bytes = audioconvert.mp4_to_webm(audio_bytes)
+                    transcribed_text = whisper.convert_audio(converted_audio_bytes, form_instance)
+                else:
+                    transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
+                form_instance.transcript = transcribed_text
+                form_instance.save()
+            except Exception as e:
+                messages.error(request, f'Error in whisper or gpt: {str(e)}')
+                return JsonResponse({'success': False})
+            
         form_responses = form_instance.formresponse_set.all()
         for form_response in form_responses:
-            gpt.process_form_query(form_response)
-        
+            try:
+                gpt.process_form_query(form_response)
+            except Exception as e:
+                messages.error(request, f'Error in whisper or gpt: {str(e)}')
+                return JsonResponse({'success': False})
+
         return JsonResponse({'success': True})
         
     return JsonResponse({'success': False})
+
 
 @login_required
 def response_form(request, form_id):
