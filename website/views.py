@@ -364,7 +364,7 @@ def stop_audio(request, form_id):
 @login_required
 def response_form(request, form_id):
     form = get_object_or_404(Form, id=form_id)
-    # have a setting to make form data public
+    # Have a setting to make form data public
     if form.user != request.user: # Only the forms attached to the user can be accessed
         return HttpResponseForbidden("You don't have permission to access this form.")
 
