@@ -98,12 +98,13 @@ def editform(request, form_template_id):
         return HttpResponseForbidden("You don't have permission to access this form.")
 
     questions = Question.objects.filter(template=form_template)
+    form_config = form_template.formconfig
 
     question_list = []
     for question in questions:
         question_list.append(question.question)
 
-    return render(request, 'editform.html', {'form_template': form_template, 'questions': question_list})
+    return render(request, 'editform.html', {'form_template': form_template, 'questions': question_list, 'form_config': form_config})
 
 @login_required
 def delete_account(request):
@@ -157,6 +158,18 @@ def create_default_form_template(request):
     return render(request, 'dashboard.html')
 
 @login_required
+def delete_form_template(request, form_template_id):
+    form_template = get_object_or_404(FormTemplate, id=form_template_id)
+    if form_template.user != request.user:
+        return HttpResponseForbidden("You don't have permission to delete this form template.")
+
+    if request.method == 'POST':
+        form_template.delete()
+        return redirect('dashboard')
+
+    return HttpResponseBadRequest("Invalid request method.")
+
+@login_required
 def edit_template_title(request, form_template_id):
     form_template = get_object_or_404(FormTemplate, id=form_template_id)
     if form_template.user != request.user:
@@ -176,6 +189,23 @@ def save_template_title(request, form_template_id):
         return redirect('editform', form_template_id=form_template.id)
 
     return HttpResponseBadRequest("Invalid request method.")
+
+def save_form_config(request, form_template_id):
+    if request.method == 'POST':
+        form_template = get_object_or_404(FormTemplate, id=form_template_id)
+        form_config = form_template.formconfig
+
+        form_config.language = request.POST.get('language')
+        form_config.conversation_type = request.POST.get('conversation_type')
+        form_config.audio_recognition_model_id = request.POST.get('audio_recognition_model_id')
+        form_config.system_prompt = request.POST.get('system_prompt')
+        form_config.ai_model_id = request.POST.get('ai_model_id')
+        form_config.temperature = request.POST.get('temperature')
+        form_config.presence_penalty = request.POST.get('presence_penalty')
+
+        form_config.save()
+
+    return redirect('editform', form_template_id=form_template_id)
 
 @login_required
 def create_question(request, form_template_id):
@@ -223,6 +253,19 @@ def save_question(request, form_template_id, question_id):
     return HttpResponseBadRequest("Invalid request method.")
 
 @login_required
+def delete_question(request, form_template_id, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    form_template = get_object_or_404(FormTemplate, id=form_template_id)
+    if form_template.user != request.user:
+        return HttpResponseForbidden("You don't have permission to delete this question.")
+
+    if request.method == 'POST':
+        question.delete()
+        return redirect('editform', form_template_id=form_template.id)
+
+    return HttpResponseBadRequest("Invalid request method.")
+
+@login_required
 def create_form(request, template_id):
     template = get_object_or_404(FormTemplate, pk=template_id)
     user = request.user  # Assuming the user is authenticated
@@ -260,7 +303,6 @@ def stop_audio(request, form_id):
     if request.method == 'POST':
         form_instance = get_object_or_404(Form, id=form_id)
         audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
-        print(request.POST.get('dataType'))
         if audio_chunk:
             audio_bytes = audio_chunk.read()
             if request.POST.get('dataType') == 'mp4':

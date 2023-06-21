@@ -11,6 +11,24 @@
         function dismissMessage(element) {
             element.parentNode.removeChild(element);
         }
+
+        function openModal() {
+            var modal = document.getElementById("formConfigModal");
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("formConfigModal");
+            modal.style.display = "none";
+        }
+
+        window.addEventListener("click", function(event) {
+            var modal = document.getElementById("formConfigModal");
+            if (event.target === modal) {
+            closeModal();
+            }
+        });
+</script>
     </script>
 </head>
 <body>
@@ -41,39 +59,109 @@
             </div>
         {% endif %}
         {% endfor %}
+        <!-- Header -->
         <div class="question-form-header">
             {% if editing %}
-                <form method="POST" action="{% url 'save_template_title' form_template.id %}">
-                    {% csrf_token %}
-                    <input class="title-editing" type="text" name="title" value="{{ form_template.title }}" autofocus>
-                    <button type="submit">Save</button>
-                </form>
+              <form method="POST" action="{% url 'save_template_title' form_template.id %}">
+                {% csrf_token %}
+                <input class="title-editing" type="text" name="title" value="{{ form_template.title }}" autofocus>
+                <button type="submit">Save</button>
+              </form>
             {% else %}
-                <span>{{ form_template.title }}</span>
+              <span>{{ form_template.title }}</span>
+              <div class="form-header-icons">
                 <a href="{% url 'edit_template_title' form_template.id %}">
-                    <i class="ph ph-pencil-simple"></i>
+                  <i class="ph ph-pencil-simple"></i>
                 </a>
+                <a class="form-header-icon" href="#" onclick="openModal()">
+                    <i class="ph ph-gear"></i>
+                </a>                  
+              </div>
             {% endif %}
-        </div>
+          </div>
+        <!-- End Header -->
         {% for question in form_template.question_set.all %}
         <div class="combined-form">
             <div class="question-form">
-                {% if editing %}
+                <span class="question-text">{{ question.question }}</span>
+                <div class="form-edit-buttons">
+                  {% if editing %}
                     <form method="POST" action="{% url 'save_question' form_template.id question.id %}">
-                        {% csrf_token %}
-                        <input class="question-editing" type="text" name="question" value="{{ question.question }}" autofocus>
-                        <button type="submit">Save</button>
+                      {% csrf_token %}
+                      <input class="question-editing" type="text" name="question" value="{{ question.question }}" autofocus>
+                      <button type="submit">Save</button>
                     </form>
-                {% else %}
-                    <span>{{ question.question }}</span>
+                  {% else %}
                     <a class="form-edit" href="{% url 'edit_question' form_template.id question.id %}">
-                        <i class="ph-bold ph-pencil-simple"></i>
+                      <i class="ph-bold ph-pencil-simple"></i>
                     </a>
-                {% endif %}
-            </div>
+                    <a class="form-edit" href="{% url 'delete_question' form_template.id question.id %}">
+                      <i class="ph-bold ph-trash"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
             <div class="response-box"></div>
         </div>
         {% endfor %}
+    </div>
+    <!-- Modal -->
+    <div id="formConfigModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Form Configuration</h2>
+            <form id="formConfigForm" method="POST" action="{% url 'save_form_config' form_template.id %}">
+                {% csrf_token %}
+                <div class="form-field">
+                    <label for="language">Language:</label>
+                    <select id="language" name="language">
+                        <option value="english" {% if form_config.language == 'english' %}selected{% endif %}>English</option>
+                        <option value="mandarin chinese" {% if form_config.language == 'mandarin chinese' %}selected{% endif %}>Mandarin Chinese</option>
+                        <option value="hindi" {% if form_config.language == 'hindi ' %}selected{% endif %}>Hindi </option>
+                        <!-- Add other language options here -->
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="conversation_type">Conversation Type:</label>
+                    <input type="text" id="conversation_type" name="conversation_type" value="{{ form_config.conversation_type }}">
+                </div>
+                <div class="form-field">
+                    <label for="audio_recognition_model_id">Audio Recognition Model:</label>
+                    <select id="audio_recognition_model_id" name="audio_recognition_model_id">
+                        <option value="whisper-1" {% if form_config.audio_recognition_model_id == 'whisper-1' %}selected{% endif %}>Whisper</option>
+                        <!-- Add other audio recognition model options here -->
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="system_prompt">System Prompt:</label>
+                    <textarea id="system_prompt" name="system_prompt">{{ form_config.system_prompt }}</textarea>
+                </div>
+                <div class="form-field">
+                    <label for="ai_model_id">AI Model:</label>
+                    <select id="ai_model_id" name="ai_model_id">
+                        <option value="gpt-3.5-turbo" {% if form_config.ai_model_id == 'gpt-3.5-turbo' %}selected{% endif %}>GPT-3.5</option>
+                        <option value="gpt-3.5-turbo-16k" {% if form_config.ai_model_id == 'gpt-3.5-turbo-16k' %}selected{% endif %}>GPT-3.5-16k</option>
+                        <option value="gpt4" {% if form_config.ai_model_id == 'gpt4' %}selected{% endif %}>GPT4</option>
+                        <!-- Add other AI model options here -->
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="temperature">Temperature:</label>
+                    <input type="number" id="temperature" name="temperature" step="0.1" min="-2" max="2" value="{{ form_config.temperature }}">
+                </div>
+                <div class="form-field">
+                    <label for="presence_penalty">Presence Penalty:</label>
+                    <input type="number" id="presence_penalty" name="presence_penalty" step="0.1" min="-2" max="2" value="{{ form_config.presence_penalty }}">
+                </div>
+                <div class="button-container">
+                    <button class="settings-button save" type="submit">Save</button>
+                    <button class="settings-button cancel" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+            <form action="{% url 'delete_form_template' form_template.id %}" method="POST">
+                {% csrf_token %}
+                <button class="settings-button danger" type="submit">Delete Form Template</button>
+            </form>
+        </div>
     </div>
 </body>
 <footer>

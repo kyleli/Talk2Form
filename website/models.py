@@ -66,7 +66,7 @@ class FormConfig(models.Model):
     AI_MODEL_CHOICES = [
         ('gpt-3.5-turbo', 'GPT-3.5'),
         ('gpt-3.5-turbo-16k', 'GPT-3.5-16k'),
-        ('gpt4', 'GPT4'),
+        ('gpt-3.5-turbo-16k', 'GPT4'),
     ]
     form_template = models.OneToOneField('FormTemplate', on_delete=models.CASCADE)
     language = models.CharField(max_length=255, default = 'english')

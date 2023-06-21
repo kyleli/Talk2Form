@@ -348,10 +348,7 @@ h2 {
   color: white;
   padding: 10px 20px;
   border-radius: 10px 10px 0 0;
-  text-decoration: none;
   margin-bottom: 0;
-  font-size: 24px;
-  font-weight: 300;
 }
 
 .editing {
@@ -384,6 +381,12 @@ h2 {
   border-radius: 50%;
 }
 
+.question-text {
+  flex-grow: 1;
+  font-size: 24px;
+  font-weight: 300;
+}
+
 .response-box {
   background-color: white;
   border: 3px solid #3B4FB6;
@@ -404,9 +407,35 @@ h2 {
   text-decoration: none;
 }
 
+.form-edit-buttons {
+  display: flex;
+}
+
+.form-edit-buttons a {
+  text-decoration: none;
+  color: white;
+}
+
+.form-edit-buttons i {
+  font-size: 20px;
+  background-color: white;
+  color: #3B4FB6;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 50%;
+}
+
 .question-form-header a {
   text-decoration: none;
   height: 60px;
+}
+
+.form-header-icons {
+  display: flex;
+}
+
+.form-header-icons a {
+  color: white;
 }
 
 /* Form End */
