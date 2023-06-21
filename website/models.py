@@ -50,7 +50,7 @@ class Question(models.Model):
 class FormResponse(models.Model):
     form = models.ForeignKey(Form, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    response = models.TextField(default="Something Went Wrong...")
+    response = models.TextField(default="Null")
     def truncated_response(self):
         if len(self.response) > 50:
             return self.response[:50] + "..."

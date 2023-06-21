@@ -346,7 +346,7 @@ def stop_audio(request, form_id):
                 form_instance.transcript = transcribed_text
                 form_instance.save()
             except Exception as e:
-                messages.error(request, f'Error in whisper or gpt: {str(e)}')
+                messages.error(request, f'Error in transcribing audio: {str(e)}')
                 return JsonResponse({'success': False})
             
         form_responses = form_instance.formresponse_set.all()
@@ -354,13 +354,12 @@ def stop_audio(request, form_id):
             try:
                 gpt.process_form_query(form_response)
             except Exception as e:
-                messages.error(request, f'Error in whisper or gpt: {str(e)}')
+                messages.error(request, f'Error processing form query: {str(e)}')
                 return JsonResponse({'success': False})
 
         return JsonResponse({'success': True})
         
     return JsonResponse({'success': False})
-
 
 @login_required
 def response_form(request, form_id):
