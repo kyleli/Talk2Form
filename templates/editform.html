@@ -95,9 +95,10 @@
                     <a class="form-edit" href="{% url 'edit_question' form_template.id question.id %}">
                       <i class="ph-bold ph-pencil-simple"></i>
                     </a>
-                    <a class="form-edit" href="{% url 'delete_question' form_template.id question.id %}">
-                      <i class="ph-bold ph-trash"></i>
-                    </a>
+                    <form method="POST" action="{% url 'delete_question' form_template.id question.id %}">
+                        {% csrf_token %}
+                        <a class="form-edit" onclick="event.preventDefault(); this.closest('form').submit();"><i class="ph-bold ph-trash"></i></a>
+                    </form>
                   {% endif %}
                 </div>
               </div>
@@ -139,8 +140,8 @@
                     <label for="ai_model_id">AI Model:</label>
                     <select id="ai_model_id" name="ai_model_id">
                         <option value="gpt-3.5-turbo" {% if form_config.ai_model_id == 'gpt-3.5-turbo' %}selected{% endif %}>GPT-3.5</option>
-                        <option value="gpt-3.5-turbo-16k" {% if form_config.ai_model_id == 'gpt-3.5-turbo-16k' %}selected{% endif %}>GPT-3.5-16k</option>
-                        <option value="gpt4" {% if form_config.ai_model_id == 'gpt4' %}selected{% endif %}>GPT4</option>
+                        <!-- <option value="gpt-3.5-turbo-16k" {% if form_config.ai_model_id == 'gpt-3.5-turbo-16k' %}selected{% endif %}>GPT-3.5-16k</option> -->
+                        <!-- <option value="gpt4" {% if form_config.ai_model_id == 'gpt4' %}selected{% endif %}>GPT4</option> -->
                         <!-- Add other AI model options here -->
                     </select>
                 </div>
