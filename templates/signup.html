@@ -6,26 +6,74 @@
     <title>Talk2Form Sign Up Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById("passwordInput");
+            var passwordToggle = document.getElementById("passwordToggle");
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                passwordToggle.innerHTML = '<i class="ph ph-eye-slash"></i>';
+            } else {
+                passwordInput.type = "password";
+                passwordToggle.innerHTML = '<i class="ph ph-eye"></i>';
+            }
+        }
+        
+        function dismissMessage(element) {
+            element.parentNode.removeChild(element);
+        }
+    </script>
 </head>
 <body>
     <div class="header">
         <h1>Request Access</h1>
     </div>
     {% for message in messages %}
-    <p class="error-message">{{message}}</p>
+    {% if message.tags %} {# check if message has tags #}
+        {% if message.tags == 'success' %}
+            <div class="message success-message">
+                <span>{{ message }}</span>
+                <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        {% elif message.tags == 'error' %}
+            <div class="message error-message">
+                <span>{{ message }}</span>
+                <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="message error-message">
+            <span>{{ message }}</span>
+            <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                <i class="ph ph-x"></i>
+            </button>
+        </div>
+    {% endif %}
     {% endfor %}
     <form method="POST" action="{% url 'signup' %}" class="form-container">
         {% csrf_token %}
         <div class="form-field">
+            <input type="text" placeholder="Full Name" name="full_name"/>
+        </div>
+        <div class="form-field">
             <input type="email" placeholder="Email" name="email"/>
         </div>
-        <div class="form-field">
-            <input type="password" placeholder="Password" name="password"/>
-        </div>
-        <div class="form-field">
-            <input type="password" placeholder="Confirm Password" name="confirmpassword"/>
+        <div class="form-field password-field">
+            <input type="password" placeholder="Password" name="password" id="passwordInput"/>
+            <span class="password-toggle" onclick="togglePasswordVisibility()" id="passwordToggle">
+                <i class="ph ph-eye"></i>
+            </span>
         </div>
         <input type="submit" class="login-button" value="Submit">
+        <div class="center-text">
+            <p>Already have an account? </p><a class="sign-in" href="/">Sign In</a>
+        </div>
     </form>
 </body>
 </html>

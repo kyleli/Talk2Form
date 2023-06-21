@@ -6,6 +6,25 @@
     <title>Talk2Form</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById("passwordInput");
+            var passwordToggle = document.getElementById("passwordToggle");
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                passwordToggle.innerHTML = '<i class="ph ph-eye-slash"></i>';
+            } else {
+                passwordInput.type = "password";
+                passwordToggle.innerHTML = '<i class="ph ph-eye"></i>';
+            }
+        }
+
+        function dismissMessage(element) {
+            element.parentNode.removeChild(element);
+        }
+    </script>
 </head>
 <body>
     <div class="header">
@@ -13,22 +32,40 @@
     </div>
     <form action="/" method="POST" class="form-container">
         {% for message in messages %}
-            {% if message.tags %} {# check if message has tags #}
-                {% if message.tags == 'success' %}
-                    <p class="success-message">{{ message }}</p>
-                {% elif message.tags == 'error' %}
-                    <p class="error-message">{{ message }}</p>
-                {% endif %}
-            {% else %}
-                <p class="error-message">{{ message }}</p>
+        {% if message.tags %} {# check if message has tags #}
+            {% if message.tags == 'success' %}
+                <div class="message success-message">
+                    <span>{{ message }}</span>
+                    <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'error' %}
+                <div class="message error-message">
+                    <span>{{ message }}</span>
+                    <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
             {% endif %}
+        {% else %}
+            <div class="message error-message">
+                <span>{{ message }}</span>
+                <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        {% endif %}
         {% endfor %}
         {% csrf_token %}
         <div class="form-field">
             <input type="email" placeholder="Email" name="email">
         </div>
-        <div class="form-field">
-            <input type="password" placeholder="Password" name="password">
+        <div class="form-field password-field">
+            <input type="password" placeholder="Password" name="password" id="passwordInput">
+            <span class="password-toggle" onclick="togglePasswordVisibility()" id="passwordToggle">
+                <i class="ph ph-eye"></i>
+            </span>
         </div>
         <input type="submit" class="login-button" value="Login">
         <a class="request-button" href="signup">Request Access</a>

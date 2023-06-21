@@ -9,18 +9,23 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 from .utils import gpt, whisper, audioconvert
 from .models import FormTemplate, User, Question, Form, FormResponse, FormConfig, FormConfig
 from django.http import JsonResponse
-from django.core.files.storage import default_storage
-
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 # Create your views here.
 def index(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
+        login_value = request.POST.get('email')
         password = request.POST.get('password')
 
-        user = auth.authenticate(username=email, password=password)
+        # Case-insensitive lookup for email
+        user = User.objects.filter(email__iexact=login_value).first()
 
-        if user is not None:
+        if user is None:
+            # Case-insensitive lookup for username
+            user = User.objects.filter(username__iexact=login_value).first()
+
+        if user is not None and user.check_password(password):
             auth.login(request, user)
             return redirect('dashboard')
         else:
@@ -28,6 +33,7 @@ def index(request):
             return redirect('index')
     else:
         return render(request, 'index.html')
+
 
 def logout(request):
     auth.logout(request)
@@ -37,16 +43,12 @@ def signup(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        confirmpassword = request.POST.get('confirmpassword')
+        full_name = request.POST.get('full_name')
 
         try:
             validate_email(email)
         except ValidationError:
             messages.error(request, 'Invalid email address')
-            return redirect('signup')
-
-        if password != confirmpassword:
-            messages.error(request, 'Passwords do not match')
             return redirect('signup')
 
         try:
@@ -58,8 +60,12 @@ def signup(request):
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already registered')
             return redirect('signup')
+        
+        name_parts = full_name.split(' ', 1)
+        first_name = name_parts[0]
+        last_name = name_parts[1] if len(name_parts) > 1 else ''
 
-        user = User.objects.create_user(username=email, email=email, password=password)
+        user = User.objects.create_user(username=email, email=email, password=password, first_name=first_name, last_name=last_name)
         messages.success(request, 'Registration successful. Please log in.')
         return redirect('index')
 
@@ -67,7 +73,23 @@ def signup(request):
 
 @login_required
 def usersettings(request):
-    return render(request, 'usersettings.html')
+    if request.method == 'POST':
+        # Handle the form submission (change password)
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # To maintain the user's session
+            messages.success(request, 'Your password was successfully changed.')
+            return redirect('usersettings')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+    else:
+        form = PasswordChangeForm(request.user)
+
+    return render(request, 'usersettings.html', {'form': form})
+
 
 @login_required
 def editform(request, form_template_id):
@@ -82,6 +104,22 @@ def editform(request, form_template_id):
         question_list.append(question.question)
 
     return render(request, 'editform.html', {'form_template': form_template, 'questions': question_list})
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        user = request.user
+        if user.check_password(password):
+            # Delete the account
+            user.delete()
+            messages.success(request, 'Your account has been deleted.')
+            return redirect('index')  # Redirect to the desired page after account deletion
+        else:
+            messages.error(request, 'Invalid password. Please try again.')
+
+    return redirect('usersettings')  # Redirect back to the user settings page
+
 
 @login_required
 def dashboard(request):

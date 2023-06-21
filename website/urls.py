@@ -17,5 +17,6 @@ urlpatterns = [
     path('create_form/<int:template_id>/', views.create_form, name='create_form'),
     path('upload_audio/<int:form_id>/', views.upload_audio, name='upload_audio'),
     path('stop_audio/<int:form_id>/', views.stop_audio, name='stop_audio'),
-    path('response_form/<int:form_id>/', views.response_form, name='response_form')
+    path('response_form/<int:form_id>/', views.response_form, name='response_form'),
+    path('delete_account/', views.delete_account, name='delete_account')
 ]

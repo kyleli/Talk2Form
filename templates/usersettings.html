@@ -7,15 +7,142 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .modal-content input[type="password"] {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+    
+    </style>
+    <script>
+        function toggleChangePassword() {
+            var changePasswordForm = document.getElementById("changePasswordForm");
+            var changePasswordButton = document.getElementById("changePasswordButton");
+
+            if (changePasswordForm.style.display === "none") {
+                changePasswordForm.style.display = "block";
+                changePasswordButton.innerHTML = "Cancel";
+            } else {
+                changePasswordForm.style.display = "none";
+                changePasswordButton.innerHTML = "Change Password";
+            }
+        }
+
+        function dismissMessage(element) {
+            element.parentNode.removeChild(element);
+        }
+        
+        function openModal() {
+            var modal = document.getElementById("deleteAccountModal");
+            modal.style.display = "block";
+        }
+        
+        function closeModal() {
+            var modal = document.getElementById("deleteAccountModal");
+            modal.style.display = "none";
+        }
+
+        window.addEventListener("click", function(event) {
+            var modal = document.getElementById("deleteAccountModal");
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="header">
         <h1>User Settings</h1>
     </div>
     <div class="form-container">
-        <a class="settings-button" href="#">Change Password</a>
-        <a class="settings-button danger" href="#">Delete Account</a>
+        {% for message in messages %}
+        {% if message.tags %} {# check if message has tags #}
+            {% if message.tags == 'success' %}
+                <div class="message success-message">
+                    <span>{{ message }}</span>
+                    <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+            {% elif message.tags == 'error' %}
+                <div class="message error-message">
+                    <span>{{ message }}</span>
+                    <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="message error-message">
+                <span>{{ message }}</span>
+                <button class="dismiss-button" onclick="dismissMessage(this.parentNode)">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+        {% endif %}
+        {% endfor %}
+        <button class="settings-button" id="changePasswordButton" onclick="toggleChangePassword()">Change Password</button>
+        <div id="changePasswordForm" style="display: none;">
+            <form method="POST" action="{% url 'usersettings' %}" class="form-container">
+                {% csrf_token %}
+                <div class="form-field">
+                    <input type="password" placeholder="Old Password" name="old_password">
+                </div>
+                <div class="form-field">
+                    <input type="password" placeholder="New Password" name="new_password1">
+                </div>
+                <div class="form-field">
+                    <input type="password" placeholder="Confirm New Password" name="new_password2">
+                </div>
+                <input type="submit" class="login-button" value="Submit">
+            </form>
+        </div>
+        <a class="settings-button danger" href="#" onclick="openModal()">Delete Account</a>
         <a class="settings-button" href="logout">Sign Out</a>
+    </div>
+    
+    <!-- Delete Account Modal -->
+    <div id="deleteAccountModal" class="modal">
+        <div class="modal-content">
+            <h2>Delete Account</h2>
+            <p>All of your account data will be deleted. This action cannot be undone. Please enter your password to confirm.</p>
+            <form id="deleteAccountForm" method="POST" action="{% url 'delete_account' %}">
+                {% csrf_token %}
+                <input type="password" placeholder="Password" name="password">
+                <div class="button-container">
+                    <button class="settings-button danger small" type="submit">Delete Account</button>
+                    <button class="settings-button cancel small" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
 </body>
 <footer>

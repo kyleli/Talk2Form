@@ -26,33 +26,45 @@ h2 {
 }
 
 /* Start Status Messages */
-
-.error-message {
-  color:red;
+.message {
   max-width: 500px;
   text-align: center;
+  align-items: center;
+  justify-content: center;
   margin: 0 auto;
   margin-top: 20px;
   margin-bottom: 20px;
   padding: 20px;
   border-radius: 10px;
+  box-sizing: border-box;
+  display: flex;
+}
+
+.error-message {
+  color:red;
   outline: red solid 1px;
   background-color: rgb(228, 199, 199);
-  box-sizing: border-box;
 }
 
 .success-message {
   color:#57a06f;
-  max-width: 500px;
-  text-align: center;
-  margin: 0 auto;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding: 20px;
-  border-radius: 10px;
   outline: #57a06f solid 1px;
   background-color: rgb(240 254 246);
-  box-sizing: border-box;
+}
+
+/* dismiss error x */
+.dismiss-button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  color: #535353;
+  padding: 0;
+  margin-left: 8px;
+  font-size: 16px
+}
+
+.dismiss-button:hover {
+  color: #000000;
 }
 
 /* End Status Messages */
@@ -78,7 +90,6 @@ h2 {
 .form-field input[type="password"] {
   width: 100%;
   font-size: 24px;
-  border: 3px solid #3B4FB6;
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 10px;
@@ -112,8 +123,27 @@ h2 {
   box-sizing: border-box;
 }
 
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
 .settings-button.danger {
   background-color: rgb(209, 71, 71);
+}
+
+.settings-button.danger.small {
+  font-size: 16px;
+}
+
+.settings-button.cancel {
+  color: black;
+  background-color: #cfcfcf;
+}
+
+.settings-button.cancel.small {
+  font-size: 16px;
 }
 
 .request-button {
@@ -134,6 +164,35 @@ h2 {
   border-radius: 10px;
   box-sizing: border-box;
 }
+
+.center-text {
+  text-align: center;
+}
+
+.center-text p,
+.center-text a.sign-in {
+  display: inline;
+}
+
+.sign-in {
+  /* Reset default link styles */
+  color: #3B4FB6;
+}
+
+/* Password Field + Show/Hide Icon */
+.password-field {
+  position: relative;
+}
+.password-toggle {
+  position: absolute;
+  top: 45%;
+  right: 10px;
+  transform: translateY(-50%);
+  padding: 5px;
+  cursor: pointer;
+  font-size: 25px;
+}
+/* End Password Field + Show/Hide Icon */
 
 /* Bottom Bar Icons */
 
