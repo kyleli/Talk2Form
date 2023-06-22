@@ -439,3 +439,19 @@ h2 {
 }
 
 /* Form End */
+
+/* Form max Count */
+.form-field {
+  position: relative;
+}
+
+.character_count {
+  position: absolute;
+  top: 80%;
+  right: 10px;
+  transform: translateY(-50%);
+  padding: 5px;
+  cursor: pointer;
+  color: #888;
+  font-size: 12px;
+}

@@ -38,6 +38,13 @@
             warningText.style.display = 'block';
             confirmBtn.style.display = 'block';
         }
+
+        function updateCharacterCount(input) {
+            var maxLength = 255;
+            var currentLength = input.value.length;
+            var counter = document.getElementById("character_count");
+            counter.textContent = currentLength + "/" + maxLength;
+        }
 </script>
     </script>
 </head>
@@ -133,8 +140,9 @@
                 </div>
                 <div class="form-field">
                     <label for="conversation_type">Conversation Type:</label>
-                    <input type="text" id="conversation_type" name="conversation_type" value="{{ form_config.conversation_type }}">
-                </div>
+                    <input type="text" id="conversation_type" name="conversation_type" maxlength="255" oninput="updateCharacterCount(this)" value="{{ form_config.conversation_type }}">
+                    <span id="character_count" class="character_count">0/255</span>
+                </div>                
                 <div class="form-field">
                     <label for="audio_recognition_model_id">Audio Recognition Model:</label>
                     <select id="audio_recognition_model_id" name="audio_recognition_model_id">
