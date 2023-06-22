@@ -115,15 +115,19 @@ def editform(request, form_template_id):
 @login_required
 def delete_account(request):
     if request.method == 'POST':
-        password = request.POST.get('password')
-        user = request.user
-        if user.check_password(password):
-            # Delete the account
-            user.delete()
-            messages.success(request, 'Your account has been deleted.')
-            return redirect('index')  # Redirect to the desired page after account deletion
-        else:
-            messages.error(request, 'Invalid password. Please try again.')
+        try:
+            password = request.POST.get('password')
+            user = request.user
+            if user.check_password(password):
+                # Delete the account
+                user.delete()
+                messages.success(request, 'Your account has been deleted.')
+                return redirect('index')  # Redirect to the desired page after account deletion
+            else:
+                messages.error(request, 'Invalid password. Please try again.')
+        except Exception as e:
+            messages.error(request, f'Error in creating question: {str(e)}')
+            return JsonResponse({'success': False})
 
     return redirect('usersettings')  # Redirect back to the user settings page
 
@@ -135,46 +139,55 @@ def dashboard(request):
 
 @login_required
 def create_default_form_template(request):
-    if request.method == 'POST':
-        user = request.user
+    try:
+        if request.method == 'POST':
+            user = request.user
 
-        # Check if the user has approval and fewer than 3 form templates
-        if user.approval or FormTemplate.objects.filter(user=user).count() < 3:
-            title = 'Untitled Form'
-            body = 'Form description'
-            form_template = FormTemplate.objects.create(title=title, body=body, user=user)
+            # Check if the user has approval and fewer than 3 form templates
+            if user.approval or FormTemplate.objects.filter(user=user).count() < 3:
+                title = 'Untitled Form'
+                body = 'Form description'
+                form_template = FormTemplate.objects.create(title=title, body=body, user=user)
 
-            # Create a Settings instance and attach it to the form_template
-            FormConfig.objects.create(
-                form_template=form_template,
-                conversation_type='A Medical Visit Between a Patient and Doctor',
-                system_prompt='''You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form query.
-                - The dialogue you are provided will consist of a conversation between a doctor and a patient.
-                - You will take this information provided and fill out the following form and write "N/A" if you do not have information to factually fill out the questions or interpret responses.
-                - You may interpret answers to the questions only using factual information stated in the transcript, do not fabricate any information.
-                - You will answer each question factually, as if you were filling out a form, and refrain from adding any additional commentary.
-                - You will only answer the question and not write anything else. If you need more information or cannot give a factual answer, write "N/A".''',
-            )
+                # Create a Settings instance and attach it to the form_template
+                FormConfig.objects.create(
+                    form_template=form_template,
+                    conversation_type='A Medical Visit Between a Patient and Doctor',
+                    system_prompt='''You are WhichDoctor AI, a medical assistant for a doctor processing inbound patients. Your goal is to help process the conversation and fill out the provided form query.
+                    - The dialogue you are provided will consist of a conversation between a doctor and a patient.
+                    - You will take this information provided and fill out the following form and write "N/A" if you do not have information to factually fill out the questions or interpret responses.
+                    - You may interpret answers to the questions only using factual information stated in the transcript, do not fabricate any information.
+                    - You will answer each question factually, as if you were filling out a form, and refrain from adding any additional commentary.
+                    - You will only answer the question and not write anything else. If you need more information or cannot give a factual answer, write "N/A".''',
+                )
 
-            # Redirect the user to the newly created form template
-            messages.success(request, 'Form Template Created. Create a new question by clicking + at the bottom of the page.')
-            return redirect('editform', form_template_id=form_template.id)
-        else:
-            messages.error(request, "Non-whitelisted accounts have a maximum of 3 form templates. Delete a form template or request whitelisted access to create a new form.")
-            return redirect('dashboard')
-
+                # Redirect the user to the newly created form template
+                messages.success(request, 'Form Template Created. Create a new question by clicking + at the bottom of the page.')
+                return redirect('editform', form_template_id=form_template.id)
+            else:
+                messages.error(request, "Non-whitelisted accounts have a maximum of 3 form templates. Delete a form template or request whitelisted access to create a new form.")
+                return redirect('dashboard')
+    except Exception as e:
+        messages.error(request, f'Error in creating form template: {str(e)}')
+        return JsonResponse({'success': False})
+    
     return render(request, 'dashboard.html')
 
 @login_required
 def delete_form_template(request, form_template_id):
-    form_template = get_object_or_404(FormTemplate, id=form_template_id)
-    if form_template.user != request.user:
-        return HttpResponseForbidden("You don't have permission to delete this form template.")
+    try:
+        form_template = get_object_or_404(FormTemplate, id=form_template_id)
+        if form_template.user != request.user:
+            return HttpResponseForbidden("You don't have permission to delete this form template.")
 
-    if request.method == 'POST':
-        form_template.delete()
-        return redirect('dashboard')
-
+        if request.method == 'POST':
+            form_template.delete()
+            return redirect('dashboard')
+        
+    except Exception as e:
+        messages.error(request, f'Error in deleting form template: {str(e)}')
+        return JsonResponse({'success': False})
+    
     return HttpResponseBadRequest("Invalid request method.")
 
 @login_required
@@ -187,89 +200,118 @@ def edit_template_title(request, form_template_id):
 
 @login_required
 def save_template_title(request, form_template_id):
-    form_template = get_object_or_404(FormTemplate, id=form_template_id)
-    if form_template.user != request.user:
-        return HttpResponseForbidden("You don't have permission to save this form.")
+    try:
+        form_template = get_object_or_404(FormTemplate, id=form_template_id)
+        if form_template.user != request.user:
+            return HttpResponseForbidden("You don't have permission to save this form.")
 
-    if request.method == 'POST':
-        form_template.title = request.POST.get('title')
-        form_template.save()
-        return redirect('editform', form_template_id=form_template.id)
-
+        if request.method == 'POST':
+            form_template.title = request.POST.get('title')
+            form_template.save()
+            return redirect('editform', form_template_id=form_template.id)
+            
+    except Exception as e:
+        messages.error(request, f'Error in saving template title: {str(e)}')
+        return JsonResponse({'success': False})
+    
     return HttpResponseBadRequest("Invalid request method.")
 
 def save_form_config(request, form_template_id):
     if request.method == 'POST':
-        form_template = get_object_or_404(FormTemplate, id=form_template_id)
-        form_config = form_template.formconfig
+        try:
+            form_template = get_object_or_404(FormTemplate, id=form_template_id)
+            form_config = form_template.formconfig
 
-        form_config.language = request.POST.get('language')
-        form_config.conversation_type = request.POST.get('conversation_type')
-        form_config.audio_recognition_model_id = request.POST.get('audio_recognition_model_id')
-        form_config.system_prompt = request.POST.get('system_prompt')
-        form_config.ai_model_id = request.POST.get('ai_model_id')
-        form_config.temperature = request.POST.get('temperature')
-        form_config.presence_penalty = request.POST.get('presence_penalty')
+            form_config.language = request.POST.get('language')
+            form_config.conversation_type = request.POST.get('conversation_type')
+            form_config.audio_recognition_model_id = request.POST.get('audio_recognition_model_id')
+            form_config.system_prompt = request.POST.get('system_prompt')
+            form_config.ai_model_id = request.POST.get('ai_model_id')
+            form_config.temperature = request.POST.get('temperature')
+            form_config.presence_penalty = request.POST.get('presence_penalty')
 
-        form_config.save()
+            form_config.save()
+
+        except Exception as e:
+            messages.error(request, f'Error in saving form config: {str(e)}')
+            return JsonResponse({'success': False})
 
     return redirect('editform', form_template_id=form_template_id)
 
 @login_required
 def create_question(request, form_template_id):
     if request.method == 'POST':
-        user = request.user
-        template = get_object_or_404(FormTemplate, id=form_template_id)
+        try:
+            user = request.user
+            template = get_object_or_404(FormTemplate, id=form_template_id)
 
-        # Check if the user has approval and fewer than 3 questions in the form template
-        if user.approval or Question.objects.filter(template=template).count() < 3:
-            title = 'New Question'
-            Question.objects.create(template=template, question=title)
-            return redirect('editform', form_template_id=form_template_id)
-        else:
-            messages.error(request, "Non-whitelisted accounts have a maximum of 3 questions per form template.")
-            return redirect('editform', form_template_id=form_template_id)
+            # Check if the user has approval and fewer than 3 questions in the form template
+            if user.approval or Question.objects.filter(template=template).count() < 3:
+                title = 'New Question'
+                Question.objects.create(template=template, question=title)
+                return redirect('editform', form_template_id=form_template_id)
+            else:
+                messages.error(request, "Non-whitelisted accounts have a maximum of 3 questions per form template.")
+                return redirect('editform', form_template_id=form_template_id)
+        
+        except Exception as e:
+            messages.error(request, f'Error in creating question: {str(e)}')
+            return JsonResponse({'success': False})
 
     return redirect('editform', form_template_id=form_template_id)
 
 @login_required
 def edit_question(request, form_template_id, question_id):
-    question = get_object_or_404(Question, id=question_id)
-    form_template = get_object_or_404(FormTemplate, id=form_template_id)
-    if form_template.user != request.user:
-        return HttpResponseForbidden("You don't have permission to edit this form.")
+    try:
+        question = get_object_or_404(Question, id=question_id)
+        form_template = get_object_or_404(FormTemplate, id=form_template_id)
+        if form_template.user != request.user:
+            return HttpResponseForbidden("You don't have permission to edit this form.")
 
-    if request.method == 'POST':
-        question.question = request.POST.get('question')
-        question.save()
-        return redirect('editform', form_template_id=form_template.id)
+        if request.method == 'POST':
+            question.question = request.POST.get('question')
+            question.save()
+            return redirect('editform', form_template_id=form_template.id)
 
+    except Exception as e:
+        messages.error(request, f'Error in editing question: {str(e)}')
+        return JsonResponse({'success': False})
+    
     return render(request, 'editform.html', {'form_template': form_template, 'question': question, 'editing': True})
 
 @login_required
 def save_question(request, form_template_id, question_id):
-    question = get_object_or_404(Question, id=question_id)
-    form_template = get_object_or_404(FormTemplate, id=form_template_id)
-    if form_template.user != request.user:
-        return HttpResponseForbidden("You don't have permission to save this form.")
+    try:
+        question = get_object_or_404(Question, id=question_id)
+        form_template = get_object_or_404(FormTemplate, id=form_template_id)
+        if form_template.user != request.user:
+            return HttpResponseForbidden("You don't have permission to save this form.")
 
-    if request.method == 'POST':
-        question.question = request.POST.get('question')
-        question.save()
-        return redirect('editform', form_template_id=form_template.id)
+        if request.method == 'POST':
+            question.question = request.POST.get('question')
+            question.save()
+            return redirect('editform', form_template_id=form_template.id)
+
+    except Exception as e:
+        messages.error(request, f'Error in saving question: {str(e)}')
+        return JsonResponse({'success': False})
 
     return HttpResponseBadRequest("Invalid request method.")
 
 @login_required
 def delete_question(request, form_template_id, question_id):
-    question = get_object_or_404(Question, id=question_id)
-    form_template = get_object_or_404(FormTemplate, id=form_template_id)
-    if form_template.user != request.user:
-        return HttpResponseForbidden("You don't have permission to delete this question.")
+    try:
+        question = get_object_or_404(Question, id=question_id)
+        form_template = get_object_or_404(FormTemplate, id=form_template_id)
+        if form_template.user != request.user:
+            return HttpResponseForbidden("You don't have permission to delete this question.")
 
-    if request.method == 'POST':
-        question.delete()
-        return redirect('editform', form_template_id=form_template.id)
+        if request.method == 'POST':
+            question.delete()
+            return redirect('editform', form_template_id=form_template.id)
+    except Exception as e:
+        messages.error(request, f'Error in deleting question: {str(e)}')
+        return JsonResponse({'success': False})
 
     return HttpResponseBadRequest("Invalid request method.")
 
@@ -279,39 +321,44 @@ def create_form(request, template_id):
     user = request.user
 
     # Check if the user has unlimited forms due to approval
-    if user.approval:
-        # Create a new Form linked to the template and the user
-        form = Form.objects.create(template=template, user=user)
-    else:
-        # Check if the user has reached the maximum number of forms per day
-        today = timezone.now().date()
-        form_count = Form.objects.filter(user=user, created_at__date=today).count()
-        if form_count >= 3:
-            reset_time = datetime.combine(today + timedelta(days=1), datetime.min.time())  # Reset time is set to midnight of the next day
-            time_left = reset_time - datetime.now()
+    try:
+        if user.approval:
+            # Create a new Form linked to the template and the user
+            form = Form.objects.create(template=template, user=user)
+        else:
+            # Check if the user has reached the maximum number of forms per day
+            today = timezone.now().date()
+            form_count = Form.objects.filter(user=user, created_at__date=today).count()
+            if form_count >= 3:
+                reset_time = datetime.combine(today + timedelta(days=1), datetime.min.time())  # Reset time is set to midnight of the next day
+                time_left = reset_time - datetime.now()
 
-            # Format the time left to display only hours, minutes, and seconds
-            hours = int(time_left.total_seconds() // 3600)
-            minutes = int((time_left.total_seconds() % 3600) // 60)
-            seconds = int(time_left.total_seconds() % 60)
-            time_left_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+                # Format the time left to display only hours, minutes, and seconds
+                hours = int(time_left.total_seconds() // 3600)
+                minutes = int((time_left.total_seconds() % 3600) // 60)
+                seconds = int(time_left.total_seconds() % 60)
+                time_left_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
-            messages.error(request, f"You have reached the maximum number of form responses allowed for today. Time left: {time_left_str}")
-            return redirect('dashboard')
+                messages.error(request, f"You have reached the maximum number of form responses allowed for today. Time left: {time_left_str}")
+                return redirect('dashboard')
 
-        # Create a new Form linked to the template and the user
-        form = Form.objects.create(template=template, user=user)
+            # Create a new Form linked to the template and the user
+            form = Form.objects.create(template=template, user=user)
 
-    # Retrieve all the questions associated with the template
-    questions = Question.objects.filter(template=template)
+        # Retrieve all the questions associated with the template
+        questions = Question.objects.filter(template=template)
 
-    # Create a FormResponse for each question
-    for question in questions:
-        FormResponse.objects.create(form=form, question=question)
+        # Create a FormResponse for each question
+        for question in questions:
+            FormResponse.objects.create(form=form, question=question)
 
-    responses = FormResponse.objects.filter(form=form)
-    # Redirect to the newly created form's page or render a success message
-    # redirect to record form
+        responses = FormResponse.objects.filter(form=form)
+        # Redirect to the newly created form's page or render a success message
+        # redirect to record form
+    except Exception as e:
+        messages.error(request, f'Error in creating form: {str(e)}')
+        return JsonResponse({'success': False})
+
     return render(request, 'record.html', {'form': form, 'responses': responses})
 
 
