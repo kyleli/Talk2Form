@@ -379,13 +379,13 @@ h2 {
 }
 
 .form-template-body {
-  font-size: 16px;
+  font-size: 20px;
   color: #555;
 }
 
 .body-editing {
   flex-grow: 1;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 300;
   color: #555;
   border: none;
@@ -533,4 +533,28 @@ h2 {
   cursor: pointer;
   color: #888;
   font-size: 12px;
+}
+
+.recording-icons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  justify-content: center;
+}
+
+.start-btn, .stop-btn, .pause-btn, .resume-btn {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 10px;
+  font-size: 100px;
+  background-color: #3B4FB6;
+  color: white;
+  text-decoration: none;
+  padding: 50px;
+  margin: 10px;
+  border-radius: 50%;
 }

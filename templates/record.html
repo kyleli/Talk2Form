@@ -10,18 +10,20 @@
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 </head>
 <body>
-    <h1>Form Created Successfully</h1>
-    <p>Form ID: {{ form }}</p>
-    <p>Template: {{ form.template }}</p>
-    {% for response in responses %}
-    <p>{{ response.question.question }}</p>
-    <p>{{ response.response }}</p>
-    {% endfor %}
-    <div class="bottom-icons">
-        <button id="start-btn">Start Recording</button>
-        <button id="stop-btn">Stop Recording</button>
-        <button id="pause-btn">Pause Recording</button>
-        <button id="resume-btn">Resume Recording</button>
+    <div class="recording-icons">
+        <div id="recording-time">0:00 / 30:00</div>
+        <button id="start-btn" class="start-btn">
+            <i class="ph ph-microphone"></i>
+        </button>
+        <button id="pause-btn" class="pause-btn" style="display: none;">
+            <i class="ph ph-pause"></i>
+        </button>
+        <button id="resume-btn" class="resume-btn" style="display: none;">
+            <i class="ph ph-play"></i>
+        </button>
+        <button id="stop-btn" class="stop-btn" style="display: none;">
+            <i class="ph ph-stop"></i>
+        </button>
     </div>
     <div id="recording-time"></div>
     <script>
@@ -45,6 +47,10 @@
         resumeBtn.addEventListener('click', resumeRecording);
 
         function startRecording() {
+            startBtn.style.display = 'none'; // Hide the start button
+            pauseBtn.style.display = 'inline-block'; // Show the pause button
+            stopBtn.style.display = 'inline-block';
+
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(function(stream) {
                     let mimeType = 'audio/webm;codec=opus';
@@ -84,6 +90,8 @@
                 mediaRecorder.pause();
                 clearInterval(intervalId); // Pause the timer
                 elapsedTime = new Date().getTime() - startTime;
+                pauseBtn.style.display = 'none'; // Hide the pause button
+                resumeBtn.style.display = 'inline-block'; // Show the resume button
             }
         }
 
@@ -92,6 +100,8 @@
                 mediaRecorder.resume();
                 startTime = new Date().getTime() - elapsedTime; // Update the start time
                 intervalId = setInterval(updateRecordingTime, 1000); // Resume the timer
+                resumeBtn.style.display = 'none'; // Hide the resume button
+                pauseBtn.style.display = 'inline-block'; // Show the pause button
             }
         }
 
@@ -125,7 +135,7 @@
             const currentSeconds = Math.floor((elapsedTime % 60000) / 1000);
             const maxMinutes = Math.floor(maxRecordingTime / 60000);
             const maxSeconds = Math.floor((maxRecordingTime % 60000) / 1000);
-            recordingTimeElement.textContent = `Recording Time: ${currentMinutes}:${currentSeconds.toString().padStart(2, '0')} / ${maxMinutes}:${maxSeconds.toString().padStart(2, '0')}`;
+            recordingTimeElement.textContent = `${currentMinutes}:${currentSeconds.toString().padStart(2, '0')} / ${maxMinutes}:${maxSeconds.toString().padStart(2, '0')}`;
         }
     </script>
 </body>
