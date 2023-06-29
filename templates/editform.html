@@ -132,7 +132,7 @@
         </div>
         <!-- End Body -->
 
-        {% for question in form_template.question_set.all %}
+        {% for question in form_template.question_set.all|dictsort:'id' %}
         <div class="combined-form">
             <div class="question-form">
                 {% if question.editing %}
@@ -158,6 +158,9 @@
             </div>
             <div class="response-box"></div>
         </div>
+        <script>
+            initializeTextarea("question-editing-{{ question.id }}");
+        </script>
         {% endfor %}
     </div>
     <!-- Modal -->
@@ -225,11 +228,6 @@
         initializeTextarea("body-editing");
         initializeTextarea("title-editing");
     </script>
-        {% for question in form_template.question_set.all %}
-        <script>
-            initializeTextarea("question-editing-{{ question.id }}");
-        </script>
-        {% endfor %}
         
 </body>
 <footer>
