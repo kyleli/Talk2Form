@@ -196,7 +196,7 @@ def edit_template_title(request, form_template_id):
     if form_template.user != request.user:
         return HttpResponseForbidden("You don't have permission to edit this form.")
 
-    return render(request, 'editform.html', {'form_template': form_template, 'editing': True})
+    return render(request, 'editform.html', {'form_template': form_template, 'editing_title': True})
 
 @login_required
 def save_template_title(request, form_template_id):
@@ -208,10 +208,36 @@ def save_template_title(request, form_template_id):
         if request.method == 'POST':
             form_template.title = request.POST.get('title')
             form_template.save()
-            return redirect('editform', form_template_id=form_template.id)
+            return render(request, 'editform.html', {'form_template': form_template, 'editing_title': False})
             
     except Exception as e:
         messages.error(request, f'Error in saving template title: {str(e)}')
+        return JsonResponse({'success': False})
+    
+    return HttpResponseBadRequest("Invalid request method.")
+
+@login_required
+def edit_template_body(request, form_template_id):
+    form_template = get_object_or_404(FormTemplate, id=form_template_id)
+    if form_template.user != request.user:
+        return HttpResponseForbidden("You don't have permission to edit this form.")
+
+    return render(request, 'editform.html', {'form_template': form_template, 'editing_body': True})
+
+@login_required
+def save_template_body(request, form_template_id):
+    try:
+        form_template = get_object_or_404(FormTemplate, id=form_template_id)
+        if form_template.user != request.user:
+            return HttpResponseForbidden("You don't have permission to save this form.")
+
+        if request.method == 'POST':
+            form_template.body = request.POST.get('body')
+            form_template.save()
+            return render(request, 'editform.html', {'form_template': form_template, 'editing_body': False})
+            
+    except Exception as e:
+        messages.error(request, f'Error in saving template description: {str(e)}')
         return JsonResponse({'success': False})
     
     return HttpResponseBadRequest("Invalid request method.")
@@ -273,6 +299,10 @@ def edit_question(request, form_template_id, question_id):
             question.save()
             return redirect('editform', form_template_id=form_template.id)
 
+        # Set editing mode for the current question
+        question.editing = True
+        question.save()
+
     except Exception as e:
         messages.error(request, f'Error in editing question: {str(e)}')
         return JsonResponse({'success': False})
@@ -289,6 +319,7 @@ def save_question(request, form_template_id, question_id):
 
         if request.method == 'POST':
             question.question = request.POST.get('question')
+            question.editing = False
             question.save()
             return redirect('editform', form_template_id=form_template.id)
 

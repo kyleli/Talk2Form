@@ -45,7 +45,20 @@
             var counter = document.getElementById("character_count");
             counter.textContent = currentLength + "/" + maxLength;
         }
-</script>
+        
+        function resizeTextarea(textarea) {
+            textarea.style.height = "auto";
+            textarea.style.height = textarea.scrollHeight + "px";
+        }
+        
+        function initializeTextarea(textareaId) {
+            var textarea = document.getElementById(textareaId);
+            resizeTextarea(textarea);
+            
+            textarea.addEventListener("input", function() {
+                resizeTextarea(this);
+            });
+        }
     </script>
 </head>
 <body>
@@ -78,47 +91,71 @@
         {% endfor %}
         <!-- Header -->
         <div class="question-form-header">
-            {% if editing %}
-              <form method="POST" action="{% url 'save_template_title' form_template.id %}">
-                {% csrf_token %}
-                <input class="title-editing" type="text" name="title" value="{{ form_template.title }}" autofocus>
-                <button type="submit">Save</button>
-              </form>
+            {% if editing_title %}
+                <form method="POST" action="{% url 'save_template_title' form_template.id %}">
+                    {% csrf_token %}
+                    <textarea id="title-editing" class="title-editing" type="text" name="title" autofocus>{{ form_template.title }}</textarea>
+                    <button type="submit">Save</button>
+                </form>
             {% else %}
-              <span>{{ form_template.title }}</span>
-              <div class="form-header-icons">
-                <a href="{% url 'edit_template_title' form_template.id %}">
-                  <i class="ph ph-pencil-simple"></i>
-                </a>
-                <a class="form-header-icon" href="#" onclick="openModal()">
-                    <i class="ph ph-gear"></i>
-                </a>                  
-              </div>
+                <span>{{ form_template.title }}</span>
+                <div class="form-header-icons">
+                    <a href="{% url 'edit_template_title' form_template.id %}">
+                        <i class="ph ph-pencil-simple"></i>
+                    </a>
+                    <a class="form-header-icon" href="#" onclick="openModal()">
+                        <i class="ph ph-gear"></i>
+                    </a>                  
+                </div>
             {% endif %}
-          </div>
+        </div>
         <!-- End Header -->
+
+        <!-- Body -->
+        <div class="question-form-body">
+            {% if form_template.body %}
+                {% if editing_body %}
+                    <form method="POST" action="{% url 'save_template_body' form_template.id %}">
+                        {% csrf_token %}
+                        <textarea id="body-editing" class="body-editing" type="text" name="body" autofocus>{{ form_template.body }}</textarea>
+                        <button type="submit">Save</button>
+                    </form>
+                {% else %}
+                    <div class="form-template-body">{{ form_template.body }}</div>
+                    <div class="form-header-icons">
+                        <a href="{% url 'edit_template_body' form_template.id %}">
+                            <i class="ph ph-pencil-simple"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+        <!-- End Body -->
+
         {% for question in form_template.question_set.all %}
         <div class="combined-form">
             <div class="question-form">
-                <span class="question-text">{{ question.question }}</span>
-                <div class="form-edit-buttons">
-                  {% if editing %}
-                    <form method="POST" action="{% url 'save_question' form_template.id question.id %}">
-                      {% csrf_token %}
-                      <input class="question-editing" type="text" name="question" value="{{ question.question }}" autofocus>
-                      <button type="submit">Save</button>
-                    </form>
-                  {% else %}
+                {% if question.editing %}
+                    <div class="form-edit-buttons">
+                        <form method="POST" action="{% url 'save_question' form_template.id question.id %}">
+                            {% csrf_token %}
+                            <textarea id="question-editing-{{ question.id }}" class="question-editing" name="question" autofocus>{{ question.question }}</textarea>
+                            <button type="submit" class="save-button"><i class="ph-bold ph-floppy-disk"></i></button>
+                        </form>
+                    </div>
+                {% else %}
+                    <span class="question-text">{{ question.question }}</span>
                     <a class="form-edit" href="{% url 'edit_question' form_template.id question.id %}">
-                      <i class="ph-bold ph-pencil-simple"></i>
+                        <i class="ph-bold ph-pencil-simple"></i>
                     </a>
                     <form method="POST" action="{% url 'delete_question' form_template.id question.id %}">
                         {% csrf_token %}
-                        <a class="form-edit" onclick="event.preventDefault(); this.closest('form').submit();"><i class="ph-bold ph-trash"></i></a>
+                        <a class="form-edit" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <i class="ph-bold ph-trash"></i>
+                        </a>
                     </form>
-                  {% endif %}
-                </div>
-              </div>
+                {% endif %}
+            </div>
             <div class="response-box"></div>
         </div>
         {% endfor %}
@@ -184,6 +221,16 @@
             </form>
         </div>
     </div>
+    <script>
+        initializeTextarea("body-editing");
+        initializeTextarea("title-editing");
+    </script>
+        {% for question in form_template.question_set.all %}
+        <script>
+            initializeTextarea("question-editing-{{ question.id }}");
+        </script>
+        {% endfor %}
+        
 </body>
 <footer>
     <div class="bottom-icons">
