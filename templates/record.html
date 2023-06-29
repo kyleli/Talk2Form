@@ -23,6 +23,7 @@
         <button id="pause-btn">Pause Recording</button>
         <button id="resume-btn">Resume Recording</button>
     </div>
+    <div id="recording-time"></div>
     <script>
         const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
 
@@ -31,8 +32,12 @@
         const stopBtn = document.getElementById('stop-btn');
         const pauseBtn = document.getElementById('pause-btn');
         const resumeBtn = document.getElementById('resume-btn');
+        const recordingTimeElement = document.getElementById('recording-time');
 
         let mediaRecorder; // MediaRecorder object
+        let startTime;
+        let intervalId;
+        let elapsedTime = 0;
 
         startBtn.addEventListener('click', startRecording);
         stopBtn.addEventListener('click', stopRecording);
@@ -55,6 +60,9 @@
                         }
                     });
                     mediaRecorder.start();
+                    startTime = new Date().getTime();
+                    intervalId = setInterval(updateRecordingTime, 1000);
+                    setTimeout(stopRecording, 1800000)
                 })
                 .catch(function(err) {
                     console.error('Error accessing microphone:', err);
@@ -67,18 +75,23 @@
                 mediaRecorder.stream.getTracks().forEach(function(track) {
                     track.stop();
                 });
+                clearInterval(intervalId);
             }
         }
 
         function pauseRecording() {
-            if (mediaRecorder && mediaRecorder.state !== 'paused') {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.pause();
+                clearInterval(intervalId); // Pause the timer
+                elapsedTime = new Date().getTime() - startTime;
             }
         }
 
         function resumeRecording() {
             if (mediaRecorder && mediaRecorder.state === 'paused') {
                 mediaRecorder.resume();
+                startTime = new Date().getTime() - elapsedTime; // Update the start time
+                intervalId = setInterval(updateRecordingTime, 1000); // Resume the timer
             }
         }
 
@@ -101,6 +114,18 @@
             .catch(function(error) {
                 console.error('Error sending audio chunk:', error);
             });
+        }
+
+        function updateRecordingTime() {
+            const currentTime = new Date().getTime();
+            const elapsedTime = currentTime - startTime;
+            const maxRecordingTime = 1800000; // 30 minutes in milliseconds
+            const remainingTime = Math.max(maxRecordingTime - elapsedTime, 0);
+            const currentMinutes = Math.floor(elapsedTime / 60000);
+            const currentSeconds = Math.floor((elapsedTime % 60000) / 1000);
+            const maxMinutes = Math.floor(maxRecordingTime / 60000);
+            const maxSeconds = Math.floor((maxRecordingTime % 60000) / 1000);
+            recordingTimeElement.textContent = `Recording Time: ${currentMinutes}:${currentSeconds.toString().padStart(2, '0')} / ${maxMinutes}:${maxSeconds.toString().padStart(2, '0')}`;
         }
     </script>
 </body>
