@@ -10,22 +10,101 @@
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 </head>
 <body>
-    <div class="recording-icons">
-        <div id="recording-time">0:00 / 30:00</div>
-        <button id="start-btn" class="start-btn">
-            <i class="ph ph-microphone"></i>
-        </button>
-        <button id="pause-btn" class="pause-btn" style="display: none;">
-            <i class="ph ph-pause"></i>
-        </button>
-        <button id="resume-btn" class="resume-btn" style="display: none;">
-            <i class="ph ph-play"></i>
-        </button>
-        <button id="stop-btn" class="stop-btn" style="display: none;">
-            <i class="ph ph-stop"></i>
-        </button>
+        <div class="form-container">
+            <!-- Header -->
+            <div class="question-form-header">
+                {% if editing_title %}
+                    <form method="POST" action="{% url 'save_template_title' form_template.id %}">
+                        {% csrf_token %}
+                        <textarea id="title-editing" class="title-editing" type="text" name="title" autofocus>{{ form_template.title }}</textarea>
+                        <button type="submit">Save</button>
+                    </form>
+                {% else %}
+                    <span>{{ form_template.title }}</span>
+                    <div class="form-header-icons">
+                        <a href="#">
+                            <i class="ph ph-pencil-simple"></i>
+                        </a>
+                        <a class="form-header-icon" href="#" onclick="openModal()">
+                            <i class="ph ph-gear"></i>
+                        </a>                  
+                    </div>
+                {% endif %}
+            </div>
+            <!-- End Header -->
+    
+            <!-- Body -->
+            <div class="question-form-body">
+                {% if form_template.body %}
+                    {% if editing_body %}
+                        <form method="POST" action="{% url 'save_template_body' form_template.id %}">
+                            {% csrf_token %}
+                            <textarea id="body-editing" class="body-editing" type="text" name="body" autofocus>{{ form_template.body }}</textarea>
+                            <button type="submit">Save</button>
+                        </form>
+                    {% else %}
+                        <div class="form-template-body">{{ form_template.body }}</div>
+                        <div class="form-header-icons">
+                            <a href="{% url 'edit_template_body' form_template.id %}">
+                                <i class="ph ph-pencil-simple"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <!-- End Body -->
+            <!-- Start Questions -->
+            {% for question in form_template.question_set.all|dictsort:'id' %}
+            <div class="combined-form">
+                <div class="question-form">
+                    {% if question.editing %}
+                        <div class="form-edit-buttons">
+                            <form method="POST" action="{% url 'save_question' form_template.id question.id %}">
+                                {% csrf_token %}
+                                <textarea id="question-editing-{{ question.id }}" class="question-editing" name="question" autofocus>{{ question.question }}</textarea>
+                                <button type="submit" class="save-button"><i class="ph-bold ph-floppy-disk"></i></button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <span class="question-text">{{ question.question }}</span>
+                        <a class="form-edit" href="{% url 'edit_question' form_template.id question.id %}">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                        </a>
+                        <form method="POST" action="{% url 'delete_question' form_template.id question.id %}">
+                            {% csrf_token %}
+                            <a class="form-edit" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <i class="ph-bold ph-trash"></i>
+                            </a>
+                        </form>
+                    {% endif %}
+                </div>
+                <div class="response-box"></div>
+            </div>
+            <script>
+                initializeTextarea("question-editing-{{ question.id }}");
+            </script>
+            {% endfor %}
+            <!-- End Questions -->
+        </div>
+    <div class="modal-background"></div>
+    <div class="modal-container">
+        <div class="recording-icons">
+            <h2>Record Conversation</h2>
+            <div id="recording-time">0:00 / 30:00</div>
+            <button id="start-btn" class="start-btn">
+                <i class="ph ph-microphone"></i>
+            </button>
+            <button id="pause-btn" class="pause-btn" style="display: none;">
+                <i class="ph ph-pause"></i>
+            </button>
+            <button id="resume-btn" class="resume-btn" style="display: none;">
+                <i class="ph ph-play"></i>
+            </button>
+            <button id="stop-btn" class="stop-btn" style="display: none;">
+                <i class="ph ph-stop"></i>
+            </button>
+        </div>
     </div>
-    <div id="recording-time"></div>
     <script>
         const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
 

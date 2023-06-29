@@ -348,14 +348,14 @@ def delete_question(request, form_template_id, question_id):
 
 @login_required
 def create_form(request, template_id):
-    template = get_object_or_404(FormTemplate, pk=template_id)
+    form_template = get_object_or_404(FormTemplate, id=template_id)
     user = request.user
 
     # Check if the user has unlimited forms due to approval
     try:
         if user.approval:
             # Create a new Form linked to the template and the user
-            form = Form.objects.create(template=template, user=user)
+            form = Form.objects.create(template=form_template, user=user)
         else:
             # Check if the user has reached the maximum number of forms per day
             today = timezone.now().date()
@@ -374,10 +374,10 @@ def create_form(request, template_id):
                 return redirect('dashboard')
 
             # Create a new Form linked to the template and the user
-            form = Form.objects.create(template=template, user=user)
+            form = Form.objects.create(template=form_template, user=user)
 
         # Retrieve all the questions associated with the template
-        questions = Question.objects.filter(template=template)
+        questions = Question.objects.filter(template=form_template)
 
         # Create a FormResponse for each question
         for question in questions:
@@ -390,7 +390,7 @@ def create_form(request, template_id):
         messages.error(request, f'Error in creating form: {str(e)}')
         return JsonResponse({'success': False})
 
-    return render(request, 'record.html', {'form': form, 'responses': responses})
+    return render(request, 'record.html', {'form': form, 'responses': responses, 'form_template': form_template})
 
 
 
