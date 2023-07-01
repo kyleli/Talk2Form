@@ -155,7 +155,6 @@ def convert_audio(audio_bytes, form_instance):
             model=audio_recognition_model_id,
             file=media_file,
             language=f"{language_code}",
-            prompt=f"This is a conversation about {conversation_type} in {spoken_language}.",
             response_format='text'
         )
         return response
