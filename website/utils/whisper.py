@@ -35,7 +35,7 @@ def convert_audio(audio_bytes, form_instance):
             api_key=os.environ.get('OPENAI_API_KEY'),
             model=audio_recognition_model_id,
             file=media_file,
-            language=f"{language}",
+            language=f"{language[:2]}",
             prompt=f"This is a conversation about {conversation_type} in {language}.",
             response_format='text'
         )
