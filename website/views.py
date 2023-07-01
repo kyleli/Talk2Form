@@ -196,7 +196,14 @@ def edit_template_title(request, form_template_id):
     if form_template.user != request.user:
         return HttpResponseForbidden("You don't have permission to edit this form.")
 
-    return render(request, 'editform.html', {'form_template': form_template, 'editing_title': True})
+    questions = Question.objects.filter(template=form_template)
+    form_config = form_template.formconfig
+
+    question_list = []
+    for question in questions:
+        question_list.append(question.question)
+
+    return render(request, 'editform.html', {'form_template': form_template, 'editing_title': True, 'questions': question_list, 'form_config': form_config})
 
 @login_required
 def save_template_title(request, form_template_id):
@@ -208,7 +215,14 @@ def save_template_title(request, form_template_id):
         if request.method == 'POST':
             form_template.title = request.POST.get('title')
             form_template.save()
-            return render(request, 'editform.html', {'form_template': form_template, 'editing_title': False})
+
+            questions = Question.objects.filter(template=form_template)
+            form_config = form_template.formconfig
+
+            question_list = []
+            for question in questions:
+                question_list.append(question.question)
+            return render(request, 'editform.html', {'form_template': form_template, 'editing_title': False, 'questions': question_list, 'form_config': form_config})
             
     except Exception as e:
         messages.error(request, f'Error in saving template title: {str(e)}')
@@ -221,8 +235,15 @@ def edit_template_body(request, form_template_id):
     form_template = get_object_or_404(FormTemplate, id=form_template_id)
     if form_template.user != request.user:
         return HttpResponseForbidden("You don't have permission to edit this form.")
+    
+    questions = Question.objects.filter(template=form_template)
+    form_config = form_template.formconfig
 
-    return render(request, 'editform.html', {'form_template': form_template, 'editing_body': True})
+    question_list = []
+    for question in questions:
+        question_list.append(question.question)
+
+    return render(request, 'editform.html', {'form_template': form_template, 'editing_body': True, 'questions': question_list, 'form_config': form_config})
 
 @login_required
 def save_template_body(request, form_template_id):
@@ -234,7 +255,15 @@ def save_template_body(request, form_template_id):
         if request.method == 'POST':
             form_template.body = request.POST.get('body')
             form_template.save()
-            return render(request, 'editform.html', {'form_template': form_template, 'editing_body': False})
+
+            questions = Question.objects.filter(template=form_template)
+            form_config = form_template.formconfig
+
+            question_list = []
+            for question in questions:
+                question_list.append(question.question)
+            
+            return render(request, 'editform.html', {'form_template': form_template, 'editing_body': False, 'questions': question_list, 'form_config': form_config})
             
     except Exception as e:
         messages.error(request, f'Error in saving template description: {str(e)}')
@@ -307,7 +336,14 @@ def edit_question(request, form_template_id, question_id):
         messages.error(request, f'Error in editing question: {str(e)}')
         return JsonResponse({'success': False})
     
-    return render(request, 'editform.html', {'form_template': form_template, 'question': question, 'editing': True})
+    questions = Question.objects.filter(template=form_template)
+    form_config = form_template.formconfig
+
+    question_list = []
+    for question in questions:
+        question_list.append(question.question)
+    
+    return render(request, 'editform.html', {'form_template': form_template, 'question': question, 'editing': True, 'questions': question_list, 'form_config': form_config})
 
 @login_required
 def save_question(request, form_template_id, question_id):
