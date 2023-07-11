@@ -1,6 +1,6 @@
 media/
 **/__pycache__/
-myprojectenv/
+talk2form-dev/
 db.sqlite3
 website/migrations/
 *.pyc
