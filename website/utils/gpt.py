@@ -1,4 +1,4 @@
-import openai
+from openai import OpenAI
 import os
 
 def new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversation_log):
@@ -15,7 +15,12 @@ def new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversation_log):
     - tokens (int): The total number of tokens used in the API response.
     - conversation_log (list): The updated conversation log with the new response appended.
     """
-    response = openai.ChatCompletion.create(
+
+    client = OpenAI(
+    api_key=os.environ['OPENAI_API_KEY'],
+    )
+
+    response = client.chat.completions.create(
         model=MODEL_ID,
         temperature=TEMPERATURE,
         presence_penalty=PRESENCE_PENALTY,
@@ -30,8 +35,6 @@ def new_entry(MODEL_ID, TEMPERATURE, PRESENCE_PENALTY, conversation_log):
     return conversation_log
 
 def process_form_query(form_response):
-    openai.api_key = os.environ.get('OPENAI_API_KEY')
-
     # Get Transcript
     form_instance = form_response.form
     TRANSCRIPT = form_instance.transcript
