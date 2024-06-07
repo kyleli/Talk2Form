@@ -127,7 +127,7 @@ def delete_account(request):
                 messages.error(request, 'Invalid password. Please try again.')
         except Exception as e:
             messages.error(request, f'Error in creating question: {str(e)}')
-            return JsonResponse({'success': False})
+            return JsonResponse({'success': False, 'error': str(e)})
 
     return redirect('usersettings')  # Redirect back to the user settings page
 
@@ -186,7 +186,7 @@ def delete_form_template(request, form_template_id):
         
     except Exception as e:
         messages.error(request, f'Error in deleting form template: {str(e)}')
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'error': str(e)})
     
     return HttpResponseBadRequest("Invalid request method.")
 
@@ -226,7 +226,7 @@ def save_template_title(request, form_template_id):
             
     except Exception as e:
         messages.error(request, f'Error in saving template title: {str(e)}')
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'error': str(e)})
     
     return HttpResponseBadRequest("Invalid request method.")
 
@@ -267,7 +267,7 @@ def save_template_body(request, form_template_id):
             
     except Exception as e:
         messages.error(request, f'Error in saving template description: {str(e)}')
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'error': str(e)})
     
     return HttpResponseBadRequest("Invalid request method.")
 
@@ -289,7 +289,7 @@ def save_form_config(request, form_template_id):
 
         except Exception as e:
             messages.error(request, f'Error in saving form config: {str(e)}')
-            return JsonResponse({'success': False})
+            return JsonResponse({'success': False, 'error': str(e)})
 
     return redirect('editform', form_template_id=form_template_id)
 
@@ -311,7 +311,7 @@ def create_question(request, form_template_id):
         
         except Exception as e:
             messages.error(request, f'Error in creating question: {str(e)}')
-            return JsonResponse({'success': False})
+            return JsonResponse({'success': False, 'error': str(e)})
 
     return redirect('editform', form_template_id=form_template_id)
 
@@ -334,7 +334,7 @@ def edit_question(request, form_template_id, question_id):
 
     except Exception as e:
         messages.error(request, f'Error in editing question: {str(e)}')
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'error': str(e)})
     
     questions = Question.objects.filter(template=form_template)
     form_config = form_template.formconfig
@@ -361,7 +361,7 @@ def save_question(request, form_template_id, question_id):
 
     except Exception as e:
         messages.error(request, f'Error in saving question: {str(e)}')
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'error': str(e)})
 
     return HttpResponseBadRequest("Invalid request method.")
 
@@ -378,7 +378,7 @@ def delete_question(request, form_template_id, question_id):
             return redirect('editform', form_template_id=form_template.id)
     except Exception as e:
         messages.error(request, f'Error in deleting question: {str(e)}')
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'error': str(e)})
 
     return HttpResponseBadRequest("Invalid request method.")
 
@@ -424,7 +424,7 @@ def create_form(request, template_id):
         # redirect to record form
     except Exception as e:
         messages.error(request, f'Error in creating form: {str(e)}')
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'error': str(e)})
 
     return render(request, 'record.html', {'form': form, 'responses': responses, 'form_template': form_template})
 
@@ -462,7 +462,7 @@ def stop_audio(request, form_id):
                 form_instance.save()
             except Exception as e:
                 messages.error(request, f'Error in transcribing audio: {str(e)}')
-                return JsonResponse({'success': False})
+                return JsonResponse({'success': False, 'error': str(e)})
             
         form_responses = form_instance.formresponse_set.all()
         for form_response in form_responses:
@@ -470,11 +470,11 @@ def stop_audio(request, form_id):
                 gpt.process_form_query(form_response)
             except Exception as e:
                 messages.error(request, f'Error processing form query: {str(e)}')
-                return JsonResponse({'success': False})
+                return JsonResponse({'success': False, 'error': str(e)})
 
         return JsonResponse({'success': True})
         
-    return JsonResponse({'success': False})
+    return JsonResponse({'success': False, 'error': str(e)})
 
 @login_required
 def response_form(request, form_id):
