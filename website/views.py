@@ -169,7 +169,7 @@ def create_default_form_template(request):
                 return redirect('dashboard')
     except Exception as e:
         messages.error(request, f'Error in creating form template: {str(e)}')
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'error': str(e)})
     
     return render(request, 'dashboard.html')
 
