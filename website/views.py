@@ -6,7 +6,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
-from .utils import gpt, whisper, audioconvert
+from .utils import gpt, whisper
 from .models import FormTemplate, User, Question, Form, FormResponse, FormConfig, FormConfig
 from django.http import JsonResponse
 from django.contrib.auth.forms import PasswordChangeForm
