@@ -447,15 +447,18 @@ def upload_audio(request, form_id):
 def stop_audio(request, form_id):
     if request.method == 'POST':
         form_instance = get_object_or_404(Form, id=form_id)
-        audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
-        if audio_chunk:
-            audio_bytes = audio_chunk.read()
+        audio_file = request.FILES.get('audioChunk')  # Get the uploaded audio file
+        
+        if audio_file:
             try:
-                if request.POST.get('dataType') == 'mp4':
-                    converted_audio_bytes = audioconvert.mp4_to_webm(audio_bytes)
-                    transcribed_text = whisper.convert_audio(converted_audio_bytes, form_instance)
-                else:
-                    transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
+                audio_bytes = audio_file.read()
+                print(f"Audio file type: {audio_file.content_type}")
+
+                # Check if conversion is needed
+                if audio_file.content_type == 'audio/mp4':
+                    audio_bytes = audioconvert.mp4_to_webm(audio_bytes)
+
+                transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
                 form_instance.transcript = transcribed_text
                 form_instance.save()
             except Exception as e:
@@ -472,7 +475,7 @@ def stop_audio(request, form_id):
 
         return JsonResponse({'success': True})
         
-    return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Method not allowed'})
 
 @login_required
 def response_form(request, form_id):

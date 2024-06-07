@@ -129,10 +129,10 @@
 
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(function(stream) {
-                    let mimeType = 'audio/webm;codec=opus';
+                    let mimeType = 'audio/webm; codec=opus';
                     let dataType = 'webm';
                     if (!MediaRecorder.isTypeSupported(mimeType)) {
-                        mimeType = 'audio/mp4;codec=aac';
+                        mimeType = 'audio/mp4; codec=aac';
                         dataType = 'mp4';
                     }
                     mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
