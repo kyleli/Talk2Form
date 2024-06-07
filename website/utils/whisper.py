@@ -158,6 +158,6 @@ def convert_audio(audio_bytes, form_instance):
             prompt=f"{conversation_type}",
             response_format='text'
         )
-        print("Model ID" + audio_recognition_model_id + "Language Code: " + language_code + "Conversation Type: " + conversation_type)
-
+        print("Model ID: " + audio_recognition_model_id + "Language Code: " + language_code + "Conversation Type: " + conversation_type)
+        print("BYTES: " + media_file)
         return response
