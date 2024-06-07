@@ -153,9 +153,6 @@ def convert_audio(audio_bytes, form_instance):
     #audio_recognition_model
     audio_recognition_model_id = form_config_instance.audio_recognition_model_id
 
-    # Debug line to print out the bytes of audio_bytes
-    print("DEBUG: audio_bytes =", audio_bytes)
-
     with BytesIOWithFilename(audio_bytes, name=f'audio_file.webm') as media_file:
         response = client.audio.transcriptions.create(
             model=audio_recognition_model_id,
@@ -164,7 +161,6 @@ def convert_audio(audio_bytes, form_instance):
             prompt=f"{conversation_type}",
             response_format='text'
         )
-        print("Model ID: " + audio_recognition_model_id + " | Language Code: " + language_code + " | Conversation Type: " + conversation_type)
-        print("DEBUG: " + os.environ.get('DEBUG') + " | DEVELOPMENT MODE: " + os.environ.get('DEVELOPMENT_MODE'))
 
+        print(response)
         return response 
