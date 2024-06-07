@@ -451,14 +451,7 @@ def stop_audio(request, form_id):
         
         if audio_file:
             try:
-                audio_bytes = audio_file.read()
-                print(f"Audio file type: {audio_file.content_type}")
-
-                # Check if conversion is needed
-                if audio_file.content_type == 'audio/mp4':
-                    audio_bytes = audioconvert.mp4_to_webm(audio_bytes)
-
-                transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
+                transcribed_text = whisper.convert_audio(audio_file, form_instance)
                 form_instance.transcript = transcribed_text
                 form_instance.save()
             except Exception as e:

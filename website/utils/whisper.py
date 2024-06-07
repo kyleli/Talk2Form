@@ -125,7 +125,7 @@ class BytesIOWithFilename(io.BytesIO):
         super().__init__(*args, **kwargs)
         self.name = name
 
-def convert_audio(audio_bytes, form_instance):
+def convert_audio(audio_file, form_instance):
     """
     Converts audio file to text using OpenAI's Whisper ASR API.
 
@@ -153,13 +153,31 @@ def convert_audio(audio_bytes, form_instance):
     #audio_recognition_model
     audio_recognition_model_id = form_config_instance.audio_recognition_model_id
 
-    with BytesIOWithFilename(audio_bytes, name=f'audio_file.webm') as media_file:
-        response = client.audio.transcriptions.create(
-            model=audio_recognition_model_id,
-            file=media_file,
-            language=f"{language_code}",
-            prompt=f"{conversation_type}",
-            response_format='text'
-        )
+    audio_bytes = audio_file.read()
+    print(f"Audio file type: {audio_file.content_type}")
 
-        return response 
+    if audio_file.content_type == 'audio/webm':
+        with BytesIOWithFilename(audio_bytes, name=f'audio_file.webm') as media_file:
+            response = client.audio.transcriptions.create(
+                model=audio_recognition_model_id,
+                file=media_file,
+                language=f"{language_code}",
+                prompt=f"{conversation_type}",
+                response_format='text'
+            )
+
+            return response
+    elif audio_file.content_type == 'audio/mp4':
+        with BytesIOWithFilename(audio_bytes, name=f'audio_file.mp4') as media_file:
+            response = client.audio.transcriptions.create(
+                model=audio_recognition_model_id,
+                file=media_file,
+                language=f"{language_code}",
+                prompt=f"{conversation_type}",
+                response_format='text'
+            )
+
+            return response
+    else:
+        print(f"Unknown file type: {audio_file.content_type}")
+        return "N/A"
