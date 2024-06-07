@@ -149,8 +149,10 @@ def convert_audio(audio_bytes, form_instance):
     #audio_recognition_model
     audio_recognition_model_id = form_config_instance.audio_recognition_model_id
 
+    client = openai.OpenAI()
+
     with BytesIOWithFilename(audio_bytes, name=f'audio_file.webm') as media_file:
-        response = openai.client.audio.transcriptions.create(
+        response = client.audio.transcriptions.create(
             api_key=os.environ.get('OPENAI_API_KEY'),
             model=audio_recognition_model_id,
             file=media_file,
