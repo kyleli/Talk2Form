@@ -436,6 +436,7 @@ def upload_audio(request, form_id):
         form_instance = get_object_or_404(Form, id=form_id)
         audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
         if audio_chunk:
+            form_instance.audio_file.save(audio_chunk.name, audio_chunk)
             audio_bytes = audio_chunk.read()
             transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
             form_instance.transcript = transcribed_text
