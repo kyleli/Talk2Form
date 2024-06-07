@@ -448,17 +448,17 @@ def stop_audio(request, form_id):
     if request.method == 'POST':
         form_instance = get_object_or_404(Form, id=form_id)
         audio_chunk = request.FILES.get('audioChunk')  # Get the uploaded audio file
-        print(request.POST.get('dataType'))
+        print("STOP AUDIO CALLED WITH DATA TYPE: " + request.POST.get('dataType'))
         if audio_chunk:
             audio_bytes = audio_chunk.read()
             try:
                 if request.POST.get('dataType') == 'mp4':
                     converted_audio_bytes = audioconvert.mp4_to_webm(audio_bytes)
                     transcribed_text = whisper.convert_audio(converted_audio_bytes, form_instance)
-                    form_instance.audio_file.save(converted_audio_bytes)
+                    print("CONVERTED MP4 TO WEBM")
                 else:
                     transcribed_text = whisper.convert_audio(audio_bytes, form_instance)
-                    form_instance.audio_file.save(audio_bytes)
+                    print("NO CONVERSION NEEDED")
                 form_instance.transcript = transcribed_text
                 form_instance.save()
             except Exception as e:
