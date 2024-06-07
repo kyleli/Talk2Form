@@ -153,12 +153,6 @@ def convert_audio(audio_bytes, form_instance):
     #audio_recognition_model
     audio_recognition_model_id = form_config_instance.audio_recognition_model_id
 
-    # Define the path to save the audio file
-    audio_file_path = os.path.join('media/audio_files', 'audio_file.webm')
-
-    with open(audio_file_path, 'wb') as audio_file:
-        audio_file.write(audio_bytes)
-
     with BytesIOWithFilename(audio_bytes, name=f'audio_file.webm') as media_file:
         response = client.audio.transcriptions.create(
             model=audio_recognition_model_id,
@@ -168,5 +162,4 @@ def convert_audio(audio_bytes, form_instance):
             response_format='text'
         )
 
-        print(response)
         return response 
