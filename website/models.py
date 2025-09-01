@@ -64,16 +64,16 @@ class FormConfig(models.Model):
         ('whisper-1', 'whisper')
     ]
     AI_MODEL_CHOICES = [
-        ('gpt-3.5-turbo', 'GPT-3.5'),
-        ('gpt-4o', 'GPT-4o'),
-        ('gpt-4-turbo', 'GPT-4'),
+        ('gpt-5', 'gpt-5'),
+        ('gpt-5-mini', 'gpt-5-mini'),
+        ('gpt-4.1', 'gpt-4.1'),
     ]
     form_template = models.OneToOneField('FormTemplate', on_delete=models.CASCADE)
     language = models.CharField(max_length=255, default = 'english')
     conversation_type = models.CharField(max_length=255, default='')
     audio_recognition_model_id = models.CharField(max_length=255, choices=AUDIO_RECOGNITION_MODEL_CHOICES, default='whisper-1')
     system_prompt = models.TextField(default='')
-    ai_model_id = models.CharField(max_length=255, choices=AI_MODEL_CHOICES, default='gpt-3.5-turbo')
+    ai_model_id = models.CharField(max_length=255, choices=AI_MODEL_CHOICES, default='gpt-5')
     temperature = models.DecimalField(max_digits=3, decimal_places=1, default=0.2, validators=[MaxValueValidator(2), MinValueValidator(-2)])
     presence_penalty = models.DecimalField(max_digits=3, decimal_places=1, default=-0.2, validators=[MaxValueValidator(2), MinValueValidator(-2)])
 

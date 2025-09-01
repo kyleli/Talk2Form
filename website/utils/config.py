@@ -7,7 +7,7 @@ WHISPER_MODEL_ID = 'whisper-1'
 AUDIO_PATH = 'CLI-version/output.mp3'
 
 # GPT Config
-MODEL_ID = 'gpt-3.5-turbo'
+MODEL_ID = 'gpt-5'
 TEMPERATURE = 0.2
 PRESENCE_PENALTY = -0.2
 MAX_TOKENS = 4096
